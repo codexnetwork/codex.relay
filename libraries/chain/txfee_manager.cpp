@@ -24,6 +24,11 @@ namespace eosio { namespace chain {
       init_native_fee(config::system_account_name, N(claim),        asset(300));
       init_native_fee(config::system_account_name, N(updatebp),     asset(100*10000));
       init_native_fee(config::system_account_name, N(setemergency), asset(10*10000));
+      init_native_fee(config::system_account_name, N(addmortgage),        asset(5*10000));
+      init_native_fee(config::system_account_name, N(claimmortgage),      asset(5*10000));
+      init_native_fee(config::system_account_name, N(claimvote),        asset(300));
+      init_native_fee(config::system_account_name, N(claimbp),        asset(300));
+      init_native_fee(config::system_account_name, N(claimdevelop),        asset(300));
 
       init_native_fee(config::system_account_name, N(setparams), asset(100*10000));
       init_native_fee(config::system_account_name, N(removebp), asset(100*10000));
@@ -31,6 +36,9 @@ namespace eosio { namespace chain {
       init_native_fee(config::token_account_name, N(transfer), asset(100));
       init_native_fee(config::token_account_name, N(issue),    asset(100));
       init_native_fee(config::token_account_name, N(create),   asset(10*10000));
+      init_native_fee(config::token_account_name, N(trade),    asset(100));
+      init_native_fee(config::token_account_name, N(castcoin),   asset(100));
+      init_native_fee(config::token_account_name, N(takecoin),    asset(1000));
 
       init_native_fee(config::system_account_name, N(setabi),  asset(1000));
       init_native_fee(config::system_account_name, config::action::setfee_name,  asset(1000));
@@ -47,6 +55,10 @@ namespace eosio { namespace chain {
       init_native_fee(config::msig_account_name, N(unapprove), asset(10000));
       init_native_fee(config::msig_account_name, N(cancel),    asset(10000));
       init_native_fee(config::msig_account_name, N(exec),      asset(10000));
+
+      init_native_fee(config::relay_account_name, N(commit),     asset(15000));
+      init_native_fee(config::relay_account_name, N(newchannel), asset(100*10000));
+      init_native_fee(config::relay_account_name, N(newmap),     asset(100*10000));
    }
 
    asset txfee_manager::get_required_fee( const controller& ctl, const action& act)const{

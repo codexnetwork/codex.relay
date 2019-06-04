@@ -71,6 +71,15 @@ namespace eosio { namespace chain {
       gmr_type_count
    };
 
+   struct system_contract {
+   public:
+      void load( const account_name& n, const boost::filesystem::path& config_path );
+
+      account_name name;
+      bytes code;
+      bytes abi;
+   };
+
    class controller {
       public:
          friend class memory_db;
@@ -94,17 +103,17 @@ namespace eosio { namespace chain {
             bool                     force_all_checks       =  false;
             bool                     disable_replay_opts    =  false;
             bool                     contracts_console      =  false;
-            bool                     allow_ram_billing_in_notify = false;
+            // in forceio relay chain, user could not set code, so
+            // we can allow ram billing in notify by default
+            bool                     allow_ram_billing_in_notify = true;
 
             genesis_state            genesis;
             wasm_interface::vm_type  wasm_runtime = chain::config::default_wasm_runtime;
 
-            bytes                                    system_code;
-            bytes                                    system_abi;
-            bytes                                    token_code;
-            bytes                                    token_abi;
-            bytes                                    msig_code;
-            bytes                                    msig_abi;
+            system_contract system;
+            system_contract token;
+            system_contract msig;
+            system_contract relay;
 
             db_read_mode             read_mode              = db_read_mode::SPECULATIVE;
             validation_mode          block_validation_mode  = validation_mode::FULL;
@@ -324,6 +333,11 @@ namespace eosio { namespace chain {
 
 } }  /// eosio::chain
 
+FC_REFLECT( eosio::chain::system_contract,
+            (name)
+            (code)
+            (abi))
+
 FC_REFLECT( eosio::chain::controller::config,
             (actor_whitelist)
             (actor_blacklist)
@@ -339,9 +353,9 @@ FC_REFLECT( eosio::chain::controller::config,
             (contracts_console)
             (genesis)
             (wasm_runtime)
-            (token_code)(token_abi)
-            (system_code)(system_abi)
-            (msig_code)(msig_abi)
+            (token)
+            (system)
+            (msig)
             (resource_greylist)
             (trusted_producers)
           )

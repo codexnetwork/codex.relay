@@ -10,7 +10,7 @@ namespace eosiosystem {
       const auto& bp = bps_tbl.get(bpname, "bpname is not registered");
 
       eosio_assert(stake.symbol == CORE_SYMBOL, "only support CORE SYMBOL token");
-      eosio_assert(0 <= stake.amount && stake.amount % 10000 == 0,
+      eosio_assert(0 <= stake.amount && stake.amount % CORE_SYMBOL_PRECISION == 0,
                    "need stake quantity >= 0 and quantity is integer");
 
       freeze_table freeze_tbl(_self, _self);
@@ -28,7 +28,7 @@ namespace eosiosystem {
       } else {
          change -= vts->vote;
          votes_tbl.modify(vts, 0, [&]( vote_info& v ) {
-            v.voteage += (v.vote.amount / 10000) * (curr_block_num - v.voteage_update_height);
+            v.voteage += (v.vote.amount / CORE_SYMBOL_PRECISION) * (curr_block_num - v.voteage_update_height);
             v.voteage_update_height = curr_block_num;
             v.vote = stake;
             if( change < asset{} ) {
@@ -48,7 +48,7 @@ namespace eosiosystem {
             }
          });
       }
-      eosio_assert(bp.isactive || (!bp.isactive && change < asset{}), "bp is not active");
+      eosio_assert(bp.isactive() || (!bp.isactive() && change < asset{}), "bp is not active");
 
       if( change > asset{} ) {
          auto fts = freeze_tbl.find(voter);
@@ -61,7 +61,7 @@ namespace eosiosystem {
       bps_tbl.modify(bp, 0, [&]( bp_info& b ) {
          b.total_voteage += b.total_staked * (curr_block_num - b.voteage_update_height);
          b.voteage_update_height = curr_block_num;
-         b.total_staked += (change.amount / 10000);
+         b.total_staked += (change.amount / CORE_SYMBOL_PRECISION);
       });
 
       vote4ramsum_table vote4ramsum_tbl(_self, _self);
