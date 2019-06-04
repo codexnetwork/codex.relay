@@ -114,18 +114,33 @@ public:
       uint64_t primary_key() const { return voter; }
    };
 
+   struct vote_reward_info {
+      int64_t total_voteage;
+      asset total_reward = asset(0);
+      int32_t  reward_block_num;
+   };
+
    struct bp_info {
       account_name    name;
       public_key_type producer_key;
       uint32_t        commission_rate;
       int64_t         total_staked             = 0;
-      asset           rewards_pool;
       asset           rewards_block;
       int64_t         total_voteage            = 0;
       uint32_t        voteage_update_height    = 0;
       std::string     url;
       bool            emergency                = false;
-      bool            isactive                 = true;
+      int32_t         active_type = 0;
+
+      int64_t      block_age = 0;
+      uint32_t      last_block_amount = 0;
+      int64_t      block_weight = 0;   //换届如何清零?
+      asset        mortgage = asset(0);
+
+      int32_t     total_drain_block = 0;
+      asset       remain_punish = asset(0);
+      int32_t     active_change_block_num = 0;
+      int32_t     reward_size = 0;
 
       bp_info() : commission_rate(0) {
       }
@@ -278,8 +293,10 @@ public:
 
 } } // namespace eosio::chain
 
+FC_REFLECT(eosio::chain::memory_db::vote_reward_info,(total_voteage)(total_reward)(reward_block_num))
 FC_REFLECT(eosio::chain::memory_db::bp_info, (name)(producer_key)
-            (commission_rate)(total_staked)(rewards_pool)(rewards_block)(total_voteage)(voteage_update_height)(url)(emergency)(isactive))
+            (commission_rate)(total_staked)(rewards_block)(total_voteage)(voteage_update_height)(url)(emergency)(active_type)
+            (block_age)(last_block_amount)(block_weight)(mortgage)(total_drain_block)(remain_punish)(active_change_block_num)(reward_size))
 FC_REFLECT(eosio::chain::memory_db::token_account, (balance))
 FC_REFLECT(eosio::chain::memory_db::eoslock_account, (owner)(balance))
 FC_REFLECT(eosio::chain::memory_db::chain_status, (name)(emergency))

@@ -15,6 +15,7 @@ add_subdirectory(identity)
 add_subdirectory(stltest)
 add_subdirectory(test.inline)
 add_subdirectory(force.system)
+add_subdirectory(sys.match)
 
 add_subdirectory(hello)
 add_subdirectory(asserter)
@@ -28,7 +29,10 @@ add_subdirectory(noop)
 add_subdirectory(tic_tac_toe)
 add_subdirectory(payloadless)
 add_subdirectory(integration_test)
+add_subdirectory(sys.bridge)
 
+add_subdirectory(force.relay)
+add_subdirectory(relay.token)
 
 file(GLOB SKELETONS RELATIVE ${CMAKE_SOURCE_DIR}/contracts "skeleton/*")
 

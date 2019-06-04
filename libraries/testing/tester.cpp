@@ -91,7 +91,67 @@ namespace eosio { namespace testing {
       cfg.contracts_console = true;
       cfg.read_mode = read_mode;
 
-      cfg.genesis.initial_timestamp = fc::time_point::from_iso_string("2020-01-01T00:00:00.000");
+   	  const char* genesis_string = R"=====(
+{
+  "initial_timestamp": "2018-05-28T12:00:00.000",
+  "initial_key": "FOSC7LmC1HJWkHNd1uJ5cBa24vZyEi1HdB4U7DncPkfqNVNfVMCR64",
+  "code": "",
+  "abi": "",
+  "token_code": "",
+  "token_abi": "",
+  "initial_configuration": {
+    "max_block_net_usage": 1048576,
+    "target_block_net_usage_pct": 1000,
+    "max_transaction_net_usage": 524288,
+    "base_per_transaction_net_usage": 12,
+    "net_usage_leeway": 500,
+    "context_free_discount_net_usage_num": 20,
+    "context_free_discount_net_usage_den": 100,
+    "max_block_cpu_usage": 1000000,
+    "target_block_cpu_usage_pct": 1000,
+    "max_transaction_cpu_usage": 750000,
+    "min_transaction_cpu_usage": 100,
+    "max_transaction_lifetime": 3600,
+    "deferred_trx_expiration_window": 600,
+    "max_transaction_delay": 3888000,
+    "max_inline_action_size": 262144,
+    "max_inline_action_depth": 4,
+    "max_authority_depth": 6
+  },
+  "initial_account_list": [{
+      "key": "FOSC7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
+      "asset": "1000000000.0000 SYS",
+      "name": "eosforce"
+    },{
+      "key": "FOSC7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
+      "asset": "1000000.0000 SYS",
+      "name": "b1"
+    },{
+      "key": "FOSC7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
+      "asset": "1000000.0000 SYS",
+      "name": "force.test"
+    },{
+      "key": "FOSC7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
+      "asset": "1000000.0000 SYS",
+      "name": "force.config"
+    }
+  ],
+  "initial_producer_list": [{
+      "name": "biosbpa",
+      "bpkey": "FOSC7LmC1HJWkHNd1uJ5cBa24vZyEi1HdB4U7DncPkfqNVNfVMCR64",
+      "commission_rate": 10,
+      "url": ""
+    }
+  ]
+}
+)=====";
+
+	  cfg.genesis = fc::json::from_string(genesis_string).as<genesis_state>();
+	  cfg.genesis.initial_account_list[0].key = get_public_key( N(eosforce), "active" );
+	  cfg.genesis.initial_account_list[2].key = get_public_key( N(force.test), "active" );
+	  cfg.genesis.initial_account_list[3].key = get_public_key( N(force.config), "active" );
+	  cfg.genesis.initial_producer_list[0].bpkey = get_public_key( N(biosbpa), "active" );
+
       cfg.genesis.initial_key = get_public_key( config::system_account_name, "active" );
 
       for(int i = 0; i < boost::unit_test::framework::master_test_suite().argc; ++i) {
@@ -100,6 +160,45 @@ namespace eosio { namespace testing {
          else if(boost::unit_test::framework::master_test_suite().argv[i] == std::string("--wabt"))
             cfg.wasm_runtime = chain::wasm_interface::vm_type::wabt;
       }
+
+// load system contract
+     	{
+#include <force.system/force.system.wast.hpp>
+#include <force.system/force.system.abi.hpp>
+#include <force.token/force.token.wast.hpp>
+#include <force.token/force.token.abi.hpp>
+#include <force.msig/force.msig.wast.hpp>
+#include <force.msig/force.msig.abi.hpp>
+#include <force.relay/force.relay.wast.hpp>
+#include <force.relay/force.relay.abi.hpp>
+
+         std::vector<uint8_t> wasm;
+         abi_def abi;
+         		
+         wasm = wast_to_wasm(force_system_wast);
+         cfg.system.code.assign(wasm.begin(), wasm.end());
+         abi = fc::json::from_string(force_system_abi).as<abi_def>();
+         cfg.system.abi = fc::raw::pack(abi);
+         cfg.system.name = config::system_account_name;
+         
+         wasm = wast_to_wasm(force_token_wast);
+         cfg.token.code.assign(wasm.begin(), wasm.end());
+         abi  = fc::json::from_string(force_token_abi).as<abi_def>();
+         cfg.token.abi = fc::raw::pack(abi);
+         cfg.token.name = config::token_account_name;
+         
+         wasm = wast_to_wasm(force_msig_wast);
+         cfg.msig.code.assign(wasm.begin(), wasm.end());
+         abi  = fc::json::from_string(force_msig_abi).as<abi_def>();
+         cfg.msig.abi = fc::raw::pack(abi);
+         cfg.msig.name = config::msig_account_name;
+            
+         wasm = wast_to_wasm(force_relay_wast);
+         cfg.relay.code.assign(wasm.begin(), wasm.end());
+         abi  = fc::json::from_string(force_relay_abi).as<abi_def>();
+         cfg.relay.abi = fc::raw::pack(abi);
+         cfg.relay.name = config::relay_account_name;
+		}
 
       open(nullptr);
 
@@ -333,8 +432,13 @@ namespace eosio { namespace testing {
                                 });
 
       set_transaction_headers(trx);
+      
       trx.sign( get_private_key( creator, "active" ), control->get_chain_id()  );
-      return push_transaction( trx );
+      auto trace = push_transaction( trx );
+      
+      transfer( N(eosforce), a, "100000.0000 SYS", "create_account", config::token_account_name );
+      
+      return trace;
    }
 
    transaction_trace_ptr base_tester::push_transaction( packed_transaction& trx,
@@ -713,11 +817,79 @@ namespace eosio { namespace testing {
       push_transaction( trx );
    }
 
+   void base_tester::set_fee( account_name account, 
+     			                  action_name action, 
+   				               asset fee, 
+   				               uint32_t cpu_limit, 
+   				               uint32_t net_limit,
+   				               uint32_t ram_limit,
+   				               const private_key_type* signer) {
+  #if RESOURCE_MODEL == RESOURCE_MODEL_FEE
+   	//   if(fee_map[action] == account) return ;
+      //   fee_map[action] = account;
+   	signed_transaction trx;
+   	account_name auth_acc;
+   	if (cpu_limit == 0 && net_limit == 0 && ram_limit)
+   	   auth_acc = account;
+   	else 
+      {
+         auth_acc = config::chain_config_name;
+      }
+      trx.actions.emplace_back( vector<permission_level>{{auth_acc, config::active_name}},
+                                setfee{
+                                   .account    = account,
+                                   .action     = action,
+                                   .fee        = fee,
+                                   .cpu_limit  = cpu_limit,
+                                   .net_limit  = net_limit,
+                                   .ram_limit  = ram_limit
+                                });
+
+      set_transaction_headers(trx);
+      if( signer ) {
+         trx.sign( *signer, control->get_chain_id()  );
+      } else {
+         trx.sign( get_private_key( auth_acc, "active" ), control->get_chain_id()  );
+      }
+      push_transaction( trx );
+	  #endif
+   }
+
+   void base_tester::set_fee( account_name auth, 
+   				               account_name account,
+     			                  action_name action, 
+   				               asset fee, 
+   				               uint32_t cpu_limit, 
+   				               uint32_t net_limit,
+   				               uint32_t ram_limit,
+   				               const private_key_type* signer) {
+   	#if RESOURCE_MODEL == RESOURCE_MODEL_FEE			
+   	//   if(fee_map[action] == account) return ;
+      //   fee_map[action] = account;
+   	signed_transaction trx;
+      trx.actions.emplace_back( vector<permission_level>{{auth,config::active_name}},
+                                setfee{
+                                   .account    = account,
+                                   .action     = action,
+                                   .fee        = fee,
+                                   .cpu_limit  = cpu_limit,
+                                   .net_limit  = net_limit,
+                                   .ram_limit  = ram_limit
+                                });
+
+      set_transaction_headers(trx);
+      if( signer ) {
+         trx.sign( *signer, control->get_chain_id()  );
+      } else {
+         trx.sign( get_private_key( auth, "active" ), control->get_chain_id()  );
+      }
+      push_transaction( trx );
+#endif
+   }
 
    bool base_tester::chain_has_transaction( const transaction_id_type& txid ) const {
       return chain_transactions.count(txid) != 0;
    }
-
 
    const transaction_receipt& base_tester::get_transaction_receipt( const transaction_id_type& txid ) const {
       return chain_transactions.at(txid);
@@ -726,7 +898,6 @@ namespace eosio { namespace testing {
    /**
     *  Reads balance as stored by generic_currency contract
     */
-
    asset base_tester::get_currency_balance( const account_name& code,
                                        const symbol&       asset_symbol,
                                        const account_name& account ) const {
@@ -746,6 +917,49 @@ namespace eosio { namespace testing {
       return asset(result, asset_symbol);
    }
 
+   /**
+    *  Reads balance as stored by generic_currency contract
+    */
+   asset base_tester::get_relay_token_currency_balance( const account_name& code,
+                                       const name&         asset_chain,
+                                       const symbol&       asset_symbol,
+                                       const account_name& account ) const {
+      const auto& db  = control->db();
+      const auto* tbl = db.template find<table_id_object, by_code_scope_table>(boost::make_tuple(code, account, N(accounts)));
+      share_type  result = 0;
+      symbol      asset_symbol2 = asset_symbol;
+      struct account {
+               uint64_t id;
+               asset balance;
+               name  chain;
+            } acc;
+
+      // the balance is implied to be 0 if either the table or row does not exist
+      if (tbl) {
+         //const auto& kv_index = db.get_index<key_value_index, by_scope_primary>();
+         const auto& secondary_index = db.get_index<index128_index>().indices();
+         //const auto& secondary_index_by_primary = secondary_index.get<by_primary>();
+         const auto& secondary_index_by_secondary = secondary_index.get<by_secondary>();
+         uint128_t acnt_idx = (uint128_t(asset_chain.value) << 64) + uint128_t(asset_symbol.to_symbol_code());
+         const auto idx_obj_iter = secondary_index_by_secondary.lower_bound(boost::make_tuple(tbl->id, acnt_idx, 0));
+         if ( idx_obj_iter == secondary_index_by_secondary.cend() || 
+            !( idx_obj_iter->t_id == tbl->id && idx_obj_iter->secondary_key == acnt_idx ) ) {
+            return asset(0, asset_symbol);
+         }
+         const auto *obj = db.template find<key_value_object, by_scope_primary>(boost::make_tuple(tbl->id, idx_obj_iter->primary_key));
+         if (obj) {
+            //balance is the second field in the serialization
+            fc::datastream<const char *> ds(obj->value.data(), obj->value.size());
+            fc::raw::unpack(ds, result);
+            fc::raw::unpack(ds, result);
+            fc::raw::unpack(ds, asset_symbol2);
+            ilog("get_relay_token_currency_balance balance: ${balance}",
+               ("balance", result)
+            );
+         }
+      }
+      return asset(result, asset_symbol2);
+   }
 
    vector<char> base_tester::get_row_by_account( uint64_t code, uint64_t scope, uint64_t table, const account_name& act ) const {
       vector<char> data;

@@ -18,7 +18,7 @@ struct key_map {
          eosio::chain::genesis_state &gs,
          const account_name &name,
          const uint64_t eos,
-         const private_key_type key = fc::crypto::private_key::generate<fc::ecc::private_key_shim>()) {
+         const private_key_type key) {
       const auto tu = eosio::chain::account_tuple{
             key.get_public_key(), eosio::chain::asset(eos * 10000), name
       };
@@ -39,8 +39,14 @@ int main( int argc, const char **argv ) {
    key_map my_sign_keymap;
    std::ofstream out("./config.ini");
 
+   // EOS5muUziYrETi5b6G2Ev91dCBrEm3qir7PK4S2qSFqfqcmouyzCr
+   const auto bp_private_key = fc::crypto::private_key(std::string("5KYQvUwt6vMpLJxqg4jSQNkuRfktDHtYDp8LPoBpYo8emvS1GfG"));
+
+   // EOS7R82SaGaJubv23GwXHyKT4qDCVXi66qkQrnjwmBUvdA4dyzEPG
+   const auto bpsign_private_key = fc::crypto::private_key(std::string("5JfjatHRwbmY8SfptFRxHnYUctfnuaxANTGDYUtkfrrBDgkh3hB"));
+
    for( int i = 0; i < config::max_producers; i++ ) {
-      auto key = fc::crypto::private_key::generate<fc::ecc::private_key_shim>();
+      auto key = bp_private_key;
       auto pub_key = key.get_public_key();
       eosio::chain::account_tuple tu;
       tu.key = pub_key;
@@ -50,7 +56,7 @@ int main( int argc, const char **argv ) {
       name.append(1u, mark);
       tu.name = string_to_name(name.c_str());
       gs.initial_account_list.push_back(tu);
-      auto sig_key = fc::crypto::private_key::generate<fc::ecc::private_key_shim>();
+      auto sig_key = bpsign_private_key;
       auto sig_pub_key = sig_key.get_public_key();
       out << "producer-name = " << name << "\n";
       out << "private-key = [\"" << string(sig_pub_key) << "\",\"" << string(sig_key) << "\"]\n";
@@ -64,27 +70,34 @@ int main( int argc, const char **argv ) {
       my_sign_keymap.keymap[string_to_name(name.c_str())] = sig_key;
    }
 
-   const auto private_key = fc::crypto::private_key::generate<fc::ecc::private_key_shim>();
+   // use fix key EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV
+   const auto private_key = fc::crypto::private_key(std::string("5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"));
 
    my_keymap.add_init_acc(gs, N(eosforce), 10000*10000, private_key);
-   my_keymap.add_init_acc(gs, N(devfund), 1, private_key);
-   my_keymap.add_init_acc(gs, N(eosfund1), 1, private_key);
-   my_keymap.add_init_acc(gs, N(b1), 1, private_key);
+   my_keymap.add_init_acc(gs, N(forceio),  5*10000,     private_key);
+   my_keymap.add_init_acc(gs, N(eos),      5*10000,     private_key);
+   my_keymap.add_init_acc(gs, N(enu),      5*10000,     private_key);
+   my_keymap.add_init_acc(gs, N(bos),      5*10000,     private_key);
+   my_keymap.add_init_acc(gs, N(tlos),     5*10000,     private_key);
+   my_keymap.add_init_acc(gs, N(meetone),  5*10000,     private_key);
+   my_keymap.add_init_acc(gs, N(test),     1000*10000,  private_key);
+
+   my_keymap.add_init_acc(gs, N(devfund),    1,       private_key);
+   my_keymap.add_init_acc(gs, N(eosfund1),   1,       private_key);
+   my_keymap.add_init_acc(gs, N(b1),         1,       private_key);
+   my_keymap.add_init_acc(gs, N(fosdevelop), 1*10000, private_key);
 
    // for test
-   my_keymap.add_init_acc(gs, N(force.test), 1*10000, private_key);
-   my_keymap.add_init_acc(gs, N(force.ram), 1*10000, private_key);
-   my_keymap.add_init_acc(gs, N(force.cpu), 1*10000, private_key);
-   my_keymap.add_init_acc(gs, N(force.net), 1*10000, private_key);
-   my_keymap.add_init_acc(gs, N(force.config), 1*10000, private_key);
+   my_keymap.add_init_acc(gs, config::test_account_name, 1*10000, private_key);
+   my_keymap.add_init_acc(gs, config::cpu_account_name,  1*10000, private_key);
+   my_keymap.add_init_acc(gs, config::ram_account_name,  1*10000, private_key);
+   my_keymap.add_init_acc(gs, config::net_account_name,  1*10000, private_key);
+   my_keymap.add_init_acc(gs, config::chain_config_name, 1*10000, private_key);
 
    // for relay
-   my_keymap.add_init_acc(gs, N(r.token.in), 100*10000, private_key);
-   my_keymap.add_init_acc(gs, N(r.token.out), 100*10000, private_key);
-   my_keymap.add_init_acc(gs, N(r.acc.map), 100*10000, private_key);
-   my_keymap.add_init_acc(gs, N(r.t.exchange), 100*10000, private_key);
-
-   my_keymap.add_init_acc(gs, N(test), 1000*10000, private_key);
+   my_keymap.add_init_acc(gs, config::match_account_name,       1000*10000, private_key);
+   my_keymap.add_init_acc(gs, config::bridge_account_name,      1000*10000, private_key);
+   my_keymap.add_init_acc(gs, config::relay_token_account_name, 1000*10000, private_key);
 
    // test accounts
    for( int j = 0; j < 26; ++j ) {

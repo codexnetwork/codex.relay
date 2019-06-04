@@ -41,6 +41,7 @@ Subcommands:
   sign                        Sign a transaction
   push                        Push arbitrary transactions to the blockchain
   multisig                    Multisig contract commands
+  trade                       Exchange tokens
 
 ```
 To get help with any particular subcommand, run it with no arguments as well:
@@ -180,6 +181,7 @@ bool   tx_print_json = false;
 bool   print_request = false;
 bool   print_response = false;
 bool   no_auto_keosd = false;
+string   voteage_bp_name = string("");
 
 uint8_t  tx_max_cpu_usage = 0;
 uint32_t tx_max_net_usage = 0;
@@ -326,6 +328,10 @@ fc::variant push_transaction( signed_transaction& trx, int32_t extra_kcpu = 1000
       trx.max_cpu_usage_ms = tx_max_cpu_usage;
       trx.max_net_usage_words = (tx_max_net_usage + 7)/8;
       trx.delay_sec = delaysec;
+      
+      if (voteage_bp_name.length() > 0) {
+         trx.transaction_extensions.emplace_back(transaction::voteage_fee, fc::raw::pack(account_name(voteage_bp_name)));
+      }
    }
 
    if (!tx_skip_sign) {
@@ -1192,6 +1198,643 @@ struct vote_producer_vote_subcommand {
    }
 };
 
+struct bridge_addmarket_subcommand {
+   string tradename;
+   string trade_maker;
+   int64_t type;
+   string base_chain;
+   string base_amount;
+   uint64_t base_weight;
+   string market_chain;
+   string market_amount;
+   uint64_t market_weight;
+
+   bridge_addmarket_subcommand(CLI::App* actionRoot) {
+      auto bridge_addmarket = actionRoot->add_subcommand("addmarket", localized("add a trade market on bridge"));
+      bridge_addmarket->add_option("trade", tradename, localized("The name of the trade market"))->required();
+      bridge_addmarket->add_option("trade_maker", trade_maker, localized("The account(s) who make the market"))->required();
+      bridge_addmarket->add_option("type", type, localized("The type of the market 1 for fixed ratio"))->required();
+      bridge_addmarket->add_option("basechain", base_chain, localized("The chain name of the base coin"))->required();
+      bridge_addmarket->add_option("baseamount", base_amount, localized("The coin of the base coin"))->required();
+      bridge_addmarket->add_option("baseweight", base_weight, localized("The weight of the base coin"))->required();
+      bridge_addmarket->add_option("marketchain", market_chain, localized("The chain name of the market coin"))->required();
+      bridge_addmarket->add_option("marketamount", market_amount, localized("The coin of the market coin"))->required();
+      bridge_addmarket->add_option("marketweight", market_weight, localized("The weight of the market coin"))->required();
+      add_standard_transaction_options(bridge_addmarket);
+      
+      bridge_addmarket->set_callback([this] {
+         auto args = fc::mutable_variant_object()
+               ("trade", tradename )
+               ("trade_maker", trade_maker)
+               ("type", type)
+               ("base_chain", base_chain)
+               ("base_amount", base_amount )
+               ("base_weight", base_weight)
+               ("market_chain", market_chain)
+               ("market_amount", market_amount)
+               ("market_weight", market_weight);
+         send_actions({create_action({permission_level{trade_maker,config::active_name}}, config::bridge_account_name, N(addmarket), args)});
+      });
+   }
+};
+
+struct bridge_settranscon_subcommand {
+   string chain_name;
+   string quantity;
+   string contract_name;
+
+   bridge_settranscon_subcommand(CLI::App* actionRoot) {
+      auto bridge_settranscon = actionRoot->add_subcommand("settranscon", localized("add a trade market on bridge"));
+      bridge_settranscon->add_option("chain_name", chain_name, localized("The chain name of the coin"))->required();
+      bridge_settranscon->add_option("quantity", quantity, localized("The coin"))->required();
+      bridge_settranscon->add_option("contract_name", contract_name, localized("The contract name to transfer the coin"))->required();
+      
+      add_standard_transaction_options(bridge_settranscon);
+      
+      bridge_settranscon->set_callback([this] {
+         auto args = fc::mutable_variant_object()
+            ("chain",chain_name)
+            ("quantity",quantity)
+            ("contract_name",contract_name);
+               
+         send_actions({create_action({permission_level{config::bridge_account_name,config::active_name}}, config::bridge_account_name, N(settranscon), args)});
+      });
+   }
+};
+
+struct bridge_addmortgage_subcommand {
+   string trade_name;
+   string trade_maker;
+   string recharge_account;
+   string coin_chain;
+   string recharge_amount;
+   string coin_type;
+
+   bridge_addmortgage_subcommand(CLI::App* actionRoot) {
+      auto bridge_addmortgage = actionRoot->add_subcommand("addmortgage", localized("add some coin to the trade market"));
+      bridge_addmortgage->add_option("trade_name", trade_name, localized("The name of the trade market"))->required();
+      bridge_addmortgage->add_option("trade_maker", trade_maker, localized("The account who make the market"))->required();
+      bridge_addmortgage->add_option("recharge_account", recharge_account, localized("the account who pay the coin"))->required();
+      bridge_addmortgage->add_option("coin_chain", coin_chain, localized("The chain name of the coin"))->required();
+      bridge_addmortgage->add_option("recharge_amount", recharge_amount, localized("The quantity of the coin"))->required();
+      bridge_addmortgage->add_option("coin_type", coin_type, localized("The type of the coin. 1 for base coin"))->required();
+      
+      add_standard_transaction_options(bridge_addmortgage);
+      
+      bridge_addmortgage->set_callback([this] {
+         string memo = trade_name + ";" + trade_maker + ";" + coin_type;
+         if (coin_chain.compare("self") == 0)
+         {
+            auto args = fc::mutable_variant_object()
+                        ("from",recharge_account)
+                        ("to", config::bridge_account_name)
+                        ("quantity",recharge_amount)
+                        ("type",2)
+                        ("memo",memo);
+            send_actions({create_action({permission_level{recharge_account,config::active_name}}, config::token_account_name, N(trade), args)});
+         }
+         else
+         {
+            auto args = fc::mutable_variant_object()
+                        ("from", recharge_account)
+                        ("to", config::bridge_account_name)
+                        ("chain", coin_chain)
+                        ("quantity", recharge_amount)
+                        ("type", 2)
+                        ("memo", memo);
+            send_actions({create_action({permission_level{recharge_account,config::active_name}}, config::relay_token_account_name, N(trade), args)});
+         }
+      });
+   }
+};
+
+struct bridge_exchange_subcommand {
+   string trade_name;
+   string trade_maker;
+   string recharge_account;
+   string recv_account;
+   string coin_chain;
+   string recharge_amount;
+   string coin_type;
+
+   bridge_exchange_subcommand(CLI::App* actionRoot) {
+      auto bridge_exchange = actionRoot->add_subcommand("exchange", localized("to do a deal on the market. you will pay a coin and receive another coin"));
+      bridge_exchange->add_option("trade_name", trade_name, localized("The name of the trade market"))->required();
+      bridge_exchange->add_option("trade_maker", trade_maker, localized("The account who make the market"))->required();
+      bridge_exchange->add_option("recharge_account", recharge_account, localized("the account who pay the coin"))->required();
+      bridge_exchange->add_option("recv_account", recv_account, localized("the account who receive the coin"))->required();
+      bridge_exchange->add_option("coin_chain", coin_chain, localized("The chain name of the coin"))->required();
+      bridge_exchange->add_option("recharge_amount", recharge_amount, localized("The quantity of the coin"))->required();
+      bridge_exchange->add_option("coin_type", coin_type, localized("The type of the coin. 1 for base coin and 2 for market coin"))->required();
+      
+      add_standard_transaction_options(bridge_exchange);
+      
+      bridge_exchange->set_callback([this] {
+         string memo = trade_name + ";" + trade_maker + ";" + recv_account + ";" + coin_type;
+         if (coin_chain.compare("self") == 0)
+         {
+            auto args = fc::mutable_variant_object()
+                        ("from",recharge_account)
+                        ("to",config::bridge_account_name)
+                        ("quantity",recharge_amount)
+                        ("type",3)
+                        ("memo",memo);
+            send_actions({create_action({permission_level{recharge_account,config::active_name}}, config::token_account_name, N(trade), args)});
+         }
+         else
+         {
+            auto args = fc::mutable_variant_object()
+                        ("from",recharge_account)
+                        ("to",config::bridge_account_name)
+                        ("chain",coin_chain)
+                        ("quantity",recharge_amount)
+                        ("type",3)
+                        ("memo",memo);
+            send_actions({create_action({permission_level{recharge_account,config::active_name}}, config::relay_token_account_name, N(trade), args)});
+         }
+      });
+   }
+};
+
+struct bridge_claimmortgage_subcommand {
+   string trade_name;
+   string trade_maker;
+   string recv_account;
+   string claim_amount;
+   string coin_type;
+
+   bridge_claimmortgage_subcommand(CLI::App* actionRoot) {
+      auto bridge_claimmortgage = actionRoot->add_subcommand("claimmortgage", localized("claim some coin from the trade market"));
+      bridge_claimmortgage->add_option("trade_name", trade_name, localized("The name of the trade market"))->required();
+      bridge_claimmortgage->add_option("trade_maker", trade_maker, localized("The account who make the market"))->required();
+      bridge_claimmortgage->add_option("recv_account", recv_account, localized("The account who receive the coin"))->required();
+      bridge_claimmortgage->add_option("claim_amount", claim_amount, localized("The quantity of the coin to claim"))->required();
+      bridge_claimmortgage->add_option("coin_type", coin_type, localized("The type of the coin. 1 for base coin"))->required();
+      
+      add_standard_transaction_options(bridge_claimmortgage);
+      
+      bridge_claimmortgage->set_callback([this] {
+         auto args = fc::mutable_variant_object()
+                     ("trade",trade_name)
+                     ("trade_maker",trade_maker)
+                     ("recv_account",recv_account)
+                     ("claim_amount",claim_amount)
+                     ("type",coin_type);
+               
+         send_actions({create_action({permission_level{trade_maker,config::active_name}}, config::bridge_account_name, N(claimmortgage), args)});
+      });
+   }
+};
+
+struct bridge_claimfee_subcommand {
+   string trade_name;
+   string trade_maker;
+   string recv_account;
+   string coin_type;
+
+   bridge_claimfee_subcommand(CLI::App* actionRoot) {
+      auto bridge_claimfee = actionRoot->add_subcommand("claimfee", localized("claim fee from the trade market"));
+      bridge_claimfee->add_option("trade_name", trade_name, localized("The name of the trade market"))->required();
+      bridge_claimfee->add_option("trade_maker", trade_maker, localized("The account who make the market"))->required();
+      bridge_claimfee->add_option("recv_account", recv_account, localized("The account who receive the coin"))->required();
+      bridge_claimfee->add_option("coin_type", coin_type, localized("The type of the coin. 1 for base coin"))->required();
+      
+      add_standard_transaction_options(bridge_claimfee);
+      
+      bridge_claimfee->set_callback([this] {
+         auto args = fc::mutable_variant_object()
+                     ("trade",trade_name)
+                     ("market_maker",trade_maker)
+                     ("recv_account",recv_account)
+                     ("type",coin_type);
+               
+         send_actions({create_action({permission_level{trade_maker,config::active_name}}, config::bridge_account_name, N(claimfee), args)});
+      });
+   }
+};
+
+struct bridge_frozenmarket_subcommand {
+   string trade_name;
+   string trade_maker;
+
+   bridge_frozenmarket_subcommand(CLI::App* actionRoot) {
+      auto bridge_frozenmarket = actionRoot->add_subcommand("frozenmarket", localized("frozen the market"));
+      bridge_frozenmarket->add_option("trade_name", trade_name, localized("The name of the trade market"))->required();
+      bridge_frozenmarket->add_option("trade_maker", trade_maker, localized("The account who make the market"))->required();
+      
+      add_standard_transaction_options(bridge_frozenmarket);
+      
+      bridge_frozenmarket->set_callback([this] {
+         auto args = fc::mutable_variant_object()
+                     ("trade",trade_name)
+                     ("trade_maker",trade_maker);
+               
+         send_actions({create_action({permission_level{trade_maker,config::active_name}}, config::bridge_account_name, N(frozenmarket), args)});
+      });
+   }
+};
+
+struct bridge_trawmarket_subcommand {
+   string trade_name;
+   string trade_maker;
+
+   bridge_trawmarket_subcommand(CLI::App* actionRoot) {
+      auto bridge_trawmarket = actionRoot->add_subcommand("trawmarket", localized("traw the market"));
+      bridge_trawmarket->add_option("trade_name", trade_name, localized("The name of the trade market"))->required();
+      bridge_trawmarket->add_option("trade_maker", trade_maker, localized("The account who make the market"))->required();
+      
+      add_standard_transaction_options(bridge_trawmarket);
+      
+      bridge_trawmarket->set_callback([this] {
+         auto args = fc::mutable_variant_object()
+                     ("trade",trade_name)
+                     ("trade_maker",trade_maker);
+               
+         send_actions({create_action({permission_level{trade_maker,config::active_name}}, config::bridge_account_name, N(trawmarket), args)});
+      });
+   }
+};
+
+struct bridge_setfixedfee_subcommand {
+   string trade_name;
+   string trade_maker;
+   string base_fee;
+   string market_fee;
+
+   bridge_setfixedfee_subcommand(CLI::App* actionRoot) {
+      auto bridge_setfixedfee = actionRoot->add_subcommand("setfixedfee", localized("set fixed fee for the trade market"));
+      bridge_setfixedfee->add_option("trade_name", trade_name, localized("The name of the trade market"))->required();
+      bridge_setfixedfee->add_option("trade_maker", trade_maker, localized("The account who make the market"))->required();
+      bridge_setfixedfee->add_option("base_asset", base_fee, localized("The fixed fee on base coin"))->required();
+      bridge_setfixedfee->add_option("market_asset", market_fee, localized("The fixed fee on market coin"))->required();
+      
+      add_standard_transaction_options(bridge_setfixedfee);
+      
+      bridge_setfixedfee->set_callback([this] {
+         auto args = fc::mutable_variant_object()
+                     ("trade",trade_name)
+                     ("trade_maker",trade_maker)
+                     ("base",base_fee)
+                     ("market",market_fee);
+               
+         send_actions({create_action({permission_level{trade_maker,config::active_name}}, config::bridge_account_name, N(setfixedfee), args)});
+      });
+   }
+};
+
+struct bridge_removemarket_subcommand {
+   string trade_name;
+   string trade_maker;
+   string base_recv;
+   string market_recv;
+
+   bridge_removemarket_subcommand(CLI::App* actionRoot) {
+      auto bridge_removemarket = actionRoot->add_subcommand("removemarket", localized("remove the trade market"));
+      bridge_removemarket->add_option("trade_name", trade_name, localized("The name of the trade market"))->required();
+      bridge_removemarket->add_option("trade_maker", trade_maker, localized("The account who make the market"))->required();
+      bridge_removemarket->add_option("base_recv", base_recv, localized("The account to receive base coin and base fee"))->required();
+      bridge_removemarket->add_option("market_recv", market_recv, localized("The account to receive market coin and market fee"))->required();
+      
+      add_standard_transaction_options(bridge_removemarket);
+      
+      bridge_removemarket->set_callback([this] {
+         auto args = fc::mutable_variant_object()
+                     ("trade",trade_name)
+                     ("trade_maker",trade_maker)
+                     ("base_recv",base_recv)
+                     ("market_recv",market_recv);
+               
+         send_actions({create_action({permission_level{trade_maker,config::active_name}}, config::bridge_account_name, N(removemarket), args)});
+      });
+   }
+};
+
+struct bridge_setprofee_subcommand {
+   string trade_name;
+   string trade_maker;
+   uint64_t base_ratio;
+   uint64_t market_ratio;
+
+   bridge_setprofee_subcommand(CLI::App* actionRoot) {
+      auto bridge_setprofee = actionRoot->add_subcommand("setprofee", localized("set Proportion fee for the trade market"));
+      bridge_setprofee->add_option("trade_name", trade_name, localized("The name of the trade market"))->required();
+      bridge_setprofee->add_option("trade_maker", trade_maker, localized("The account who make the market"))->required();
+      bridge_setprofee->add_option("base_ratio", base_ratio, localized("Proportion of fees charged for purchase of base_coin The base is 10000"))->required();
+      bridge_setprofee->add_option("market_ratio", market_ratio, localized("Proportion of fees charged when purchasing market_coin  The base is 10000"))->required();
+      
+      add_standard_transaction_options(bridge_setprofee);
+      
+      bridge_setprofee->set_callback([this] {
+         auto args = fc::mutable_variant_object()
+                     ("trade",trade_name)
+                     ("trade_maker",trade_maker)
+                     ("base_ratio",base_ratio)
+                     ("market_ratio",market_ratio);
+         send_actions({create_action({permission_level{trade_maker,config::active_name}}, config::bridge_account_name, N(setprofee), args)});
+      });
+   }
+};
+
+struct bridge_setprominfee_subcommand {
+   string trade_name;
+   string trade_maker;
+   uint64_t base_ratio;
+   uint64_t market_ratio;
+   string base_fee;
+   string market_fee;
+
+   bridge_setprominfee_subcommand(CLI::App* actionRoot) {
+      auto bridge_setprominfee = actionRoot->add_subcommand("setprominfee", localized("set Proportion but has a Minimum fee for the trade market"));
+      bridge_setprominfee->add_option("trade_name", trade_name, localized("The name of the trade market"))->required();
+      bridge_setprominfee->add_option("trade_maker", trade_maker, localized("The account who make the market"))->required();
+      bridge_setprominfee->add_option("base_ratio", base_ratio, localized("Proportion of fees charged for purchase of base_coin The base is 10000"))->required();
+      bridge_setprominfee->add_option("market_ratio", market_ratio, localized("Proportion of fees charged when purchasing market_coin  The base is 10000"))->required();
+      bridge_setprominfee->add_option("base_asset", base_fee, localized("The fixed fee on base coin"))->required();
+      bridge_setprominfee->add_option("market_asset", market_fee, localized("The fixed fee on market coin"))->required();
+      
+      add_standard_transaction_options(bridge_setprominfee);
+      
+      bridge_setprominfee->set_callback([this] {
+         auto args = fc::mutable_variant_object()
+                     ("trade",trade_name)
+                     ("trade_maker",trade_maker)
+                     ("base_ratio",base_ratio)
+                     ("market_ratio",market_ratio)
+                     ("base",base_fee)
+                     ("market",market_fee);
+               
+         send_actions({create_action({permission_level{trade_maker,config::active_name}}, config::bridge_account_name, N(setprominfee), args)});
+      });
+   }
+};
+
+struct bridge_setweight_subcommand {
+   string trade_name;
+   string trade_maker;
+   uint64_t base_weight;
+   uint64_t market_weight;
+
+   bridge_setweight_subcommand(CLI::App* actionRoot) {
+      auto bridge_setweight = actionRoot->add_subcommand("setweight", localized("set Proportion fee for the trade market"));
+      bridge_setweight->add_option("trade_name", trade_name, localized("The name of the trade market"))->required();
+      bridge_setweight->add_option("trade_maker", trade_maker, localized("The account who make the market"))->required();
+      bridge_setweight->add_option("base_weight", base_weight, localized("The weight of the base coin"))->required();
+      bridge_setweight->add_option("market_weight", market_weight, localized("The weight of the market weight"))->required();
+      
+      add_standard_transaction_options(bridge_setweight);
+      
+      bridge_setweight->set_callback([this] {
+         auto args = fc::mutable_variant_object()
+                     ("trade",trade_name)
+                     ("trade_maker",trade_maker)
+                     ("base_weight",base_weight)
+                     ("market_weight",market_weight);
+         send_actions({create_action({permission_level{trade_maker,config::active_name}}, config::bridge_account_name, N(setweight), args)});
+      });
+   }
+};
+
+
+struct match_regex_subcommand {
+   string exc_acc;
+
+   match_regex_subcommand(CLI::App* actionRoot) {
+      auto match_regex = actionRoot->add_subcommand("regex", localized("to register an exchange account."));
+      match_regex->add_option("exc_acc", exc_acc, localized("exchange account"))->required();
+      
+      add_standard_transaction_options(match_regex);
+      
+      match_regex->set_callback([this] {
+         auto args = fc::mutable_variant_object()
+                     ("exc_acc", exc_acc);
+         send_actions({create_action({permission_level{exc_acc, config::active_name}}, config::match_account_name, N(regex), args)});
+      });
+   }
+};
+
+struct match_createpair_subcommand {
+   string base;
+   string base_chain;
+   string base_sym;
+   string quote;
+   string quote_chain;
+   string quote_sym;
+   string fee_rate;
+   string exc_acc;
+
+   match_createpair_subcommand(CLI::App* actionRoot) {
+      auto match_createpair = actionRoot->add_subcommand("create", localized("to create a trading pair."));
+      match_createpair->add_option("base", base, localized("The display name of base token of the trading pair"))->required();
+      match_createpair->add_option("base_chain", base_chain, localized("from which chain"))->required();
+      match_createpair->add_option("base_sym", base_sym, localized("from which token"))->required();
+      match_createpair->add_option("quote", quote, localized("The display name of quote token of the trading pair"))->required();
+      match_createpair->add_option("quote_chain", quote_chain, localized("from which chain"))->required();
+      match_createpair->add_option("quote_sym", quote_sym, localized("from which token"))->required();
+      match_createpair->add_option("exc_acc", exc_acc, localized("exchange account"))->required();
+      
+      add_standard_transaction_options(match_createpair);
+      
+      match_createpair->set_callback([this] {
+         auto args = fc::mutable_variant_object()
+                     ("base", base)
+                     ("base_chain", base_chain)
+                     ("base_sym", base_sym)
+                     ("quote", quote)
+                     ("quote_chain", quote_chain)
+                     ("quote_sym", quote_sym)
+                     ("exc_acc", exc_acc);
+         send_actions({create_action({permission_level{exc_acc, config::active_name}}, config::match_account_name, N(create), args)});
+      });
+   }
+};
+
+struct match_trade_subcommand {
+   string bid_or_ask;
+   string pair_id;
+   string payer;
+   string receiver;
+   string chain;
+   string quantity;
+   string price;
+   string exc_acc;
+   string referer;
+
+   match_trade_subcommand(CLI::App* actionRoot) {
+      auto match_trade = actionRoot->add_subcommand("trade", localized("to exchange a token for another token."));
+      match_trade->add_option("bid_or_ask", bid_or_ask, localized("1 - buy, 0 - sell"))->required();
+      match_trade->add_option("pair_id", pair_id, localized("pair id"))->required();
+      match_trade->add_option("payer", payer, localized("originating account"))->required();
+      match_trade->add_option("receiver", receiver, localized("receiving account"))->required();
+      match_trade->add_option("chain", chain, localized("from which chain"))->required();
+      match_trade->add_option("quantity", quantity, localized("the amount to pay"))->required();
+      match_trade->add_option("price", price, localized("price"))->required();
+      match_trade->add_option("exchange", exc_acc, localized("price"))->required();
+      match_trade->add_option("referer", referer, localized("price"))->required();
+      
+      add_standard_transaction_options(match_trade);
+      
+      match_trade->set_callback([this] {
+         string memo = receiver + ";" + pair_id + ";" + price + ";" + bid_or_ask + ";" + exc_acc + ";" + referer;
+        
+         auto args = fc::mutable_variant_object()
+                     ("from", payer)
+                     ("to", "sys.match")
+                     ("chain", chain)
+                     ("quantity", quantity)
+                     ("type", 1)
+                     ("memo", memo);
+         send_actions({create_action({permission_level{payer, config::active_name}}, config::relay_token_account_name, N(trade), args)});
+      });
+   }
+};
+
+struct match_cancel_subcommand {
+   string maker;
+   string type;
+   string order_or_pair_id;
+
+   match_cancel_subcommand(CLI::App* actionRoot) {
+      auto match_cancel = actionRoot->add_subcommand("cancel", localized("to cancel orders."));
+      match_cancel->add_option("maker", maker, localized("the account that makes the order"))->required();
+      match_cancel->add_option("type", type, localized("cancel type: 0 - designated order_id , 1 - designated pair_id, 2 - all orders"))->required();
+      match_cancel->add_option("order_or_pair_id", order_or_pair_id, localized("order id"))->required();
+      
+      add_standard_transaction_options(match_cancel);
+      
+      match_cancel->set_callback([this] {
+         auto args = fc::mutable_variant_object()
+                     ("maker", maker)
+                     ("type", type)
+                     ("order_or_pair_id_str", order_or_pair_id);
+         send_actions({create_action({permission_level{maker, config::active_name}}, config::match_account_name, N(cancel), args)});
+      });
+   }
+};
+
+struct match_mark_subcommand {
+   string base_chain;
+   string base_sym;
+   string quote_chain;
+   string quote_sym;
+
+   match_mark_subcommand(CLI::App* actionRoot) {
+      auto match_mark = actionRoot->add_subcommand("mark", localized("to mark trading pairs for calculating turnover."));
+      match_mark->add_option("base_chain", base_chain, localized("base chain"))->required();
+      match_mark->add_option("base_sym", base_sym, localized("base symbol"))->required();
+      match_mark->add_option("quote_chain", quote_chain, localized("quote chain"))->required();
+      match_mark->add_option("quote_sym", quote_sym, localized("quote symbol"))->required();
+      
+      add_standard_transaction_options(match_mark);
+      
+      match_mark->set_callback([this] {
+         auto args = fc::mutable_variant_object()
+                     ("base_chain", base_chain)
+                     ("base_sym", base_sym)
+                     ("quote_chain", quote_chain)
+                     ("quote_sym", quote_sym);
+         send_actions({create_action(get_account_permissions(tx_permission, {config::match_account_name, config::active_name}), config::match_account_name, N(mark), args)});
+      });
+   }
+};
+
+struct match_claim_subcommand {
+   string base_chain;
+   string base_sym;
+   string quote_chain;
+   string quote_sym;
+   string exc_acc;
+   string fee_acc;
+
+   match_claim_subcommand(CLI::App* actionRoot) {
+      auto match_claim = actionRoot->add_subcommand("claim", localized("to claim fees."));
+      match_claim->add_option("base_chain", base_chain, localized("base chain"))->required();
+      match_claim->add_option("base_sym", base_sym, localized("base symbol"))->required();
+      match_claim->add_option("quote_chain", quote_chain, localized("quote chain"))->required();
+      match_claim->add_option("quote_sym", quote_sym, localized("quote symbol"))->required();
+      match_claim->add_option("exc_acc", exc_acc, localized("exchange account"))->required();
+      match_claim->add_option("fee_acc", fee_acc, localized("fee account"))->required();
+   
+      add_standard_transaction_options(match_claim);
+      
+      match_claim->set_callback([this] {
+         auto args = fc::mutable_variant_object()
+                     ("base_chain", base_chain)
+                     ("base_sym", base_sym)
+                     ("quote_chain", quote_chain)
+                     ("quote_sym", quote_sym)
+                     ("exc_acc", exc_acc)
+                     ("fee_acc", fee_acc);
+         send_actions({create_action({permission_level{exc_acc, config::active_name}}, config::match_account_name, N(claim), args)});
+      });
+   }
+};
+
+struct match_freeze_subcommand {
+   string id;
+
+   match_freeze_subcommand(CLI::App* actionRoot) {
+      auto match_freeze = actionRoot->add_subcommand("freeze", localized("to freeze trading pair."));
+      match_freeze->add_option("id", id, localized("exchange pair id"))->required();
+   
+      add_standard_transaction_options(match_freeze);
+      
+      match_freeze->set_callback([this] {
+         auto args = fc::mutable_variant_object()
+                     ("id", id);
+         send_actions({create_action(get_account_permissions(tx_permission), config::match_account_name, N(freeze), args)});
+      });
+   }
+};
+
+struct match_unfreeze_subcommand {
+   string id;
+
+   match_unfreeze_subcommand(CLI::App* actionRoot) {
+      auto match_unfreeze = actionRoot->add_subcommand("unfreeze", localized("to unfreeze trading pair."));
+      match_unfreeze->add_option("id", id, localized("exchange pair id"))->required();
+   
+      add_standard_transaction_options(match_unfreeze);
+      
+      match_unfreeze->set_callback([this] {
+         auto args = fc::mutable_variant_object()
+                     ("id", id);
+         send_actions({create_action(get_account_permissions(tx_permission), config::match_account_name, N(unfreeze), args)});
+      });
+   }
+};
+
+struct match_setfee_subcommand {
+   string exx_acc;
+   string pair_id;
+   string type;
+   string rate;
+   string chain;
+   string asset;
+   
+   match_setfee_subcommand(CLI::App* actionRoot) {
+      auto match_setfee = actionRoot->add_subcommand("setfee", localized("to set trading pair fee rate for exchange."));
+      match_setfee->add_option("exx_acc", exx_acc, localized("exx_acc"))->required();
+      match_setfee->add_option("pair_id", pair_id, localized("pair id"))->required();
+      match_setfee->add_option("type", type, localized("type"))->required();
+      match_setfee->add_option("rate", rate, localized("rate"))->required();
+      match_setfee->add_option("chain", chain, localized("chain"))->required();
+      match_setfee->add_option("asset", chain, localized("asset"))->required();
+   
+      add_standard_transaction_options(match_setfee);
+      
+      match_setfee->set_callback([this] {
+         auto args = fc::mutable_variant_object()
+                     ("pair_id", pair_id)
+                     ("exx_acc", exx_acc)
+                     ("type", type)
+                     ("rate", rate)
+                     ("chain", chain)
+                     ("asset", asset);
+         send_actions({create_action(get_account_permissions(tx_permission), config::match_account_name, N(setfee), args)});
+      });
+   }
+};
+
 struct list_bp_subcommand {
    uint32_t limit = 50;
    list_bp_subcommand(CLI::App* actionRoot) {
@@ -1887,6 +2530,8 @@ int main( int argc, char** argv ) {
    app.add_flag( "-v,--verbose", verbose_errors, localized("output verbose actions on error"));
    app.add_flag("--print-request", print_request, localized("print HTTP request to STDERR"));
    app.add_flag("--print-response", print_response, localized("print HTTP response to STDERR"));
+
+   app.add_option( "--voteage-bp-name", voteage_bp_name, localized("bp name for voteage deduction fee"), true );
 
    auto version = app.add_subcommand("version", localized("Retrieve version information"), false);
    version->require_subcommand();
@@ -3424,6 +4069,37 @@ int main( int argc, char** argv ) {
 
       send_actions({chain::action{accountPermissions, wrap_con, "exec", variant_to_bin( wrap_con, N(exec), args ) }});
    });
+   // bridge subcommand
+   auto bridge = app.add_subcommand("bridge", localized("Send sys.bridge contract action to the blockchain."), false);
+   bridge->require_subcommand();
+
+   auto bridge_addmarket = bridge_addmarket_subcommand(bridge);
+   auto bridge_settranscon = bridge_settranscon_subcommand(bridge);
+   auto bridge_addmortgage = bridge_addmortgage_subcommand(bridge);
+   auto bridge_claimmortgage = bridge_claimmortgage_subcommand(bridge);
+   auto bridge_frozenmarket = bridge_frozenmarket_subcommand(bridge);
+   auto bridge_trawmarket = bridge_trawmarket_subcommand(bridge);
+   auto bridge_setfixedfee = bridge_setfixedfee_subcommand(bridge);
+   auto bridge_setprofee = bridge_setprofee_subcommand(bridge);
+   auto bridge_setprominfee = bridge_setprominfee_subcommand(bridge);
+   auto bridge_exchange = bridge_exchange_subcommand(bridge);
+   auto bridge_setweight = bridge_setweight_subcommand(bridge);
+   auto bridge_claimfee = bridge_claimfee_subcommand(bridge);
+   auto bridge_removemarket = bridge_removemarket_subcommand(bridge);
+
+   // match subcommand
+   auto match = app.add_subcommand("match", localized("Send sys.match contract action to the blockchain."), false);
+   match->require_subcommand();
+   
+   auto match_regex        = match_regex_subcommand(match);
+   auto match_createpair   = match_createpair_subcommand(match);
+   auto match_trade        = match_trade_subcommand(match);
+   auto match_cancel       = match_cancel_subcommand(match);
+   auto match_mark         = match_mark_subcommand(match);
+   auto match_claim        = match_claim_subcommand(match);
+   auto match_freeze       = match_freeze_subcommand(match);
+   auto match_unfreeze     = match_unfreeze_subcommand(match);
+   auto match_setfee       = match_setfee_subcommand(match);
 
    // system subcommand
    auto system = app.add_subcommand("system", localized("Send eosio.system contract action to the blockchain."), false);
