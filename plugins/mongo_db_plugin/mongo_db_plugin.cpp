@@ -442,7 +442,7 @@ void mongo_db_plugin_impl::consume_blocks() {
       _account_controls = mongo_conn[db_name][account_controls_col];
       _orders = mongo_conn[db_name][orders_col];
       _deals = mongo_conn[db_name][deals_col];
-      //insert_default_abi();
+      insert_default_abi();
       while (true) {
          boost::mutex::scoped_lock lock(mtx);
          while ( transaction_metadata_queue.empty() &&
@@ -2041,6 +2041,10 @@ void mongo_db_plugin_impl::insert_default_abi()
          add_account_control( newacc.active.accounts, name_account, active, now ); 
 
          auto account = find_account( _accounts, name_account );
+         if (!account) {
+            elog( "can not find account account: ${account}", ("account", name_account));
+            return;
+         }
          auto abiPath = app().config_dir() / "force.token" += ".abi";
          FC_ASSERT( fc::exists( abiPath ), "no abi file found ");
          auto abijson = fc::json::from_file(abiPath).as<abi_def>();
@@ -2066,10 +2070,62 @@ void mongo_db_plugin_impl::insert_default_abi()
             }
       }
       get_abi_serializer(name_account);
+      
+      name_account = chain::config::relay_token_account_name;
+      {
+         abi_cache_index.erase( name_account );
+         chain::newaccount newacc{
+                                 .creator  = chain::config::system_account_name,
+                                 .name     = name_account,
+                                 .owner    = authority( get_public_key( name_account, "owner" ) ),
+                                 .active   = authority( get_public_key( name_account, "active" ) )
+                                 };
+         create_account( _accounts, name_account, now );
+         add_pub_keys( newacc.owner.keys, name_account, owner, now );
+         add_account_control( newacc.owner.accounts, name_account, owner, now );
+         add_pub_keys( newacc.active.keys, name_account, active, now );
+         add_account_control( newacc.active.accounts, name_account, active, now ); 
+
+         auto account = find_account( _accounts, name_account );
+         if (!account) {
+            elog( "can not find account account: ${account}", ("account", name_account));
+            return;
+         }
+         auto abiPath = app().config_dir() / "relay.token" / "relay.token.abi";
+         FC_ASSERT( fc::exists( abiPath ), "no abi file found ");
+         auto abi_def2 = fc::json::from_file(abiPath).as<abi_def>();
+         //auto abijson = fc::json::from_file(abiPath).as<abi_def>();
+         //auto abi = fc::raw::pack(abijson);
+         //abi_def abi_def = fc::raw::unpack<chain::abi_def>( abi );
+         const string json_str = fc::json::to_string( abi_def2 );
+         try{
+               auto update_from = make_document(
+                     kvp( "$set", make_document( kvp( "abi", bsoncxx::from_json( json_str )),
+                                                 kvp( "updatedAt", b_date{now} ))));
+
+               try {
+                  if( !_accounts.update_one( make_document( kvp( "_id", account->view()["_id"].get_oid())),
+                                            update_from.view())) {
+                     EOS_ASSERT( false, chain::mongo_db_update_fail, "Failed to udpdate account ${n}", ("n", name_account));
+                  }
+               } catch( ... ) {
+                  handle_mongo_exception( "account update", __LINE__ );
+               }
+            } catch( bsoncxx::exception& e ) {
+               elog( "Unable to convert abi JSON to MongoDB JSON: ${e}", ("e", e.what()));
+               elog( "  JSON: ${j}", ("j", json_str));
+            }
+      }
+      get_abi_serializer(name_account);
+      
       name_account = chain::config::system_account_name;
       {
          abi_cache_index.erase( name_account );
          auto account = find_account( _accounts, name_account );
+         if (!account) {
+            elog( "can not find account account: ${account}", ("account", name_account));
+            return;
+         }
          fc::path abiPath = app().config_dir() / "force.system" += ".abi";
          
          FC_ASSERT( fc::exists( abiPath ), "no abi file found ");
