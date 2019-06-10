@@ -1386,7 +1386,7 @@ namespace exchange {
 
    struct sys_match_match {
       uint32_t transfer_type;
-      account_name receiver;
+      //account_name receiver;
       uint32_t pair_id;
       
       asset price;
@@ -1408,17 +1408,16 @@ namespace exchange {
       eosio_assert(memoParts.size() >= 1,"memo contains memeo");
       if (memoParts[0].compare("trade") == 0) {
          transfer_type = 1;
-         eosio_assert(memoParts.size() == 8,"memo is not adapted with sys_match_match");
+         eosio_assert(memoParts.size() == 7,"memo is not adapted with sys_match_match");
 
-         receiver    = ::eosio::string_to_name(memoParts[1].c_str());
-         pair_id     = (uint32_t)atoi(memoParts[2].c_str());
-         price       = asset_from_string(memoParts[3]);
-         bid_or_ask  = (uint32_t)atoi(memoParts[4].c_str());
-         exc_acc     = ::eosio::string_to_name(memoParts[5].c_str());
-         referer     = memoParts[6];
-         fee_type    = (uint32_t)atoi(memoParts[7].c_str());
+         pair_id     = (uint32_t)atoi(memoParts[1].c_str());
+         price       = asset_from_string(memoParts[2]);
+         bid_or_ask  = (uint32_t)atoi(memoParts[3].c_str());
+         exc_acc     = ::eosio::string_to_name(memoParts[4].c_str());
+         referer     = memoParts[5];
+         fee_type    = (uint32_t)atoi(memoParts[6].c_str());
          eosio_assert(bid_or_ask == 0 || bid_or_ask == 1,"type is not adapted with sys_match_match");
-         //print("-------sys_match_match::parse receiver=", ::eosio::name{.value=receiver}, ", pair_id=", pair_id, ", price=", price, " bid_or_ask=", bid_or_ask, " exc_acc=", ::eosio::name{.value=exc_acc}, " referer=", referer, "\n");
+         //print("-------sys_match_match::parse pair_id=", pair_id, ", price=", price, " bid_or_ask=", bid_or_ask, " exc_acc=", ::eosio::name{.value=exc_acc}, " referer=", referer, "\n");
       }
       else if (memoParts[0].compare("points") == 0) {
          transfer_type = 2;
@@ -1446,7 +1445,7 @@ namespace exchange {
                  {permission_level{ smm.exc_acc, N(active) }, 
                  permission_level{ config::match_account_name, N(active) }},
                  config::match_account_name, N(match),
-                 std::make_tuple(smm.pair_id, from, smm.receiver, chain, quantity, smm.price, smm.bid_or_ask, smm.exc_acc, smm.referer, smm.fee_type)
+                 std::make_tuple(smm.pair_id, from, from, chain, quantity, smm.price, smm.bid_or_ask, smm.exc_acc, smm.referer, smm.fee_type)
          ).send();
       } else if (smm.transfer_type == 2) { // points
          eosio_assert(chain == name{}, "must be issued by system token contract!");
