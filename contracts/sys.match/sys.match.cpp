@@ -542,7 +542,6 @@ namespace exchange {
       auto idx_fees = fees_tbl.template get_index<N(idxkey)>();
       auto idxkey_taker = (uint128_t(exc_acc) << 64) | pair_id;
       auto itr_fee_taker = idx_fees.find(idxkey_taker);
-      auto itr_fee_maker = idx_fees.find(idxkey_taker);
 
       auto base = quantity * precision(price.symbol.precision()) / price.amount;
       base    = convert(itr1->base, base);
@@ -579,6 +578,8 @@ namespace exchange {
       auto walk_table_range = [&]( auto itr, auto end_itr ) {
          bool  full_match;
          asset deal_base;
+         uint128_t idxkey_maker;
+         auto itr_fee_maker = idx_fees.find(idxkey_taker);
          asset cumulated_base          = to_asset(relay_token_acc, itr1->base_chain, itr1->base_sym, asset(0));
 
          //print("\n---exchange::match_for_bid: quantity=", quantity, ", quant_after_fee=", quant_after_fee,", cumulated_refund_quote=", cumulated_refund_quote,"\n");
@@ -597,19 +598,19 @@ namespace exchange {
 
          for( ; itr != end_itr; ) {
             print("\n bid: order: id=", itr->id, ", pair_id=", itr->pair_id, ", bid_or_ask=", itr->bid_or_ask,", base=", itr->base,", price=", itr->price,", maker=", eosio::name{.value = itr->maker});
-            // only traverse ask orders
-            /*if (itr->bid_or_ask) {
-                itr++;
-                continue;
+
+            idxkey_maker   = (uint128_t(itr->exc_acc) << 64) | pair_id;
+            itr_fee_maker  = idx_fees.find(idxkey_maker);
+            if (itr_fee_maker->frozen) {
+               itr++;
+               
+               if (itr == end_itr) {
+                  send_cumulated();
+                  insert_order(orders, order_id, itr1->id, exc_acc, bid_or_ask, base, price, payer, receiver, fee_type, timestamp);
+               }
+               
+               continue;
             }
-            // no matching sell order
-            if (price < itr->price) {
-               send_cumulated();
-               // insert the order
-               insert_order(orders, itr1->id, bid_or_ask, base, price, payer, receiver);
-               return;
-            }*/
-            
             
             if (base <= itr->base) {
                full_match  = true;
@@ -751,6 +752,8 @@ namespace exchange {
       auto walk_table_range = [&]( auto itr, auto end_itr ) {
          bool  full_match;
          asset deal_base;
+         uint128_t idxkey_maker;
+         auto itr_fee_maker = idx_fees.find(idxkey_taker);
          asset cumulated_quote         = to_asset(relay_token_acc, itr1->quote_chain, itr1->quote_sym, asset(0));
          
          auto send_cumulated = [&]() {
@@ -762,19 +765,22 @@ namespace exchange {
          
          for ( auto exit_on_done = false; !exit_on_done; ) {
             print("\n ask: order: id=", end_itr->id, ", pair_id=", end_itr->pair_id, ", bid_or_ask=", end_itr->bid_or_ask,", base=", end_itr->base,", price=", end_itr->price,", maker=", eosio::name{.value = end_itr->maker});
-            // only traverse bid orders
-            if (end_itr == itr) exit_on_done = true;
-            /*if (!end_itr->bid_or_ask) {
-               if (!exit_on_done) end_itr--;
+            
+            idxkey_maker   = (uint128_t(end_itr->exc_acc) << 64) | pair_id;
+            itr_fee_maker  = idx_fees.find(idxkey_maker);
+            if (itr_fee_maker->frozen) {
+               if (end_itr == itr) {
+                  exit_on_done = true;
+                  send_cumulated();
+                  insert_order(orders, order_id, itr1->id, exc_acc, bid_or_ask, base, price, payer, receiver, fee_type, timestamp);
+               } else {
+                  end_itr--;
+               }
+               
                continue;
+            } else if (end_itr == itr) { 
+               exit_on_done = true;
             }
-            // no matching bid order
-            if (price > end_itr->price) {
-               send_cumulated();
-               // insert the order
-               insert_order(orders, itr1->id, bid_or_ask, base, price, payer, receiver);
-               return;
-            }*/
             
             if ( base <= end_itr->base ) {// full match
                full_match = true;
