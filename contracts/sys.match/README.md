@@ -29,11 +29,13 @@ exc_acc:    exchange account
 note: you  must freeze 1000 or more CDX to open trading pair, only exchange account can open trading pair
 
 4、freeze the trading pair
-void freeze(uint32_t id);
-id: pair id
+void freeze(account_name exc_acc, uint32_t id);
+exc_acc: exchange account
+id:      pair id
 
 5、unfreeze the trading pair
-id: pair id
+exc_acc: exchange account
+id:      pair id
 
 6. close trading pair 
 void close(name base_chain, symbol_type base_sym, name quote_chain, symbol_type quote_sym, account_name exc_acc);
@@ -81,7 +83,7 @@ to:      escrow account, now must be 'sys.match'
 chain: 	from which chain  
 quantity: transfer token amount
 type:    trade type (1 is matching trading)
-memo:    trade parameters, format trade;receiver;trading pair ID;price;buy or sell (1 is buying, 0 is selling);exchange account;referer;fee type(1 means pay by ratio, 2 means pay by exchange token)，for example, "trade;testa;0;4000.00 CUSDT;0;biosbpa;testa;1"
+memo:    trade parameters, format trade;trading pair ID;price;buy or sell (1 is buying, 0 is selling);exchange account;referer;fee type(1 means pay by ratio, 2 means pay by exchange token)，for example, "trade;testa;0;4000.00 CUSDT;0;biosbpa;testa;1"
 
 12. Cancel the order
 void cancel(account_name maker, uint32_t type, uint64_t order_or_pair_id);   
@@ -212,11 +214,11 @@ efc push action sys.match withdraw '["testb", "1000.0000 CDX"]' -p testb
 
 3. buy tokens           
 
-efc push action relay.token trade '["testb", "sys.match", "usdt1", "39500.0000 CUSDT", "1", "trade;testb;1;3950.00 CUSDT;1;biosbpa;;2"]' -p testb
+efc push action relay.token trade '["testb", "sys.match", "usdt1", "39500.0000 CUSDT", "1", "trade;1;3950.00 CUSDT;1;biosbpa;;2"]' -p testb
 
 4. sell tokens   
 
-efc push action relay.token trade '["testa", "sys.match", "btc1", "4.0000 CBTC", "1", "trade;testa;1;4000.00 CUSDT;0;biosbpa;testc;1"]' -p testa
+efc push action relay.token trade '["testa", "sys.match", "btc1", "4.0000 CBTC", "1", "trade;1;4000.00 CUSDT;0;biosbpa;testc;1"]' -p testa
 
 5. cancel the order     
 
