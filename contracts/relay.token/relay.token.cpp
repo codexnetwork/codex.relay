@@ -483,7 +483,7 @@ void token::settle_user(account_name owner, name chain, asset value) {
    for(auto it = reward_inf.begin();it != reward_inf.end();++it) {
       if (last_update_height < it->reward_block_num && it->total_mineage > 0) {
          auto mineage = last_mineage + from.balance.amount * (it->reward_block_num - last_update_height);
-         auto reward = it->reward_pool * mineage / it->total_mineage;
+         auto reward = asset(static_cast<int128_t>(it->reward_pool.amount) * mineage / it->total_mineage);
 
          total_reward += reward;
          reward_inf.modify(*it,0,[&]( auto& s ) {
