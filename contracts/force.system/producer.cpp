@@ -459,6 +459,8 @@ namespace eosiosystem {
          power = power / (int128_t)REWARD_RATIO_PRECISION;
          power = power * (int128_t)price;
          power = power / (int128_t)precision(existing->supply.symbol.precision());
+         power = power * (int128_t)existing->coin_weight;
+         power = power / (int128_t)REWARD_RATIO_PRECISION;
 
          total_power += power;
       }

@@ -351,7 +351,8 @@
             {"name":"total_mineage",        "type":"int128"},
             {"name":"total_mineage_update_height","type":"uint32"},
             {"name":"reward_scope",        "type":"uint64"},
-            {"name":"reward_size",        "type":"int32"}
+            {"name":"reward_size",        "type":"int32"},
+            {"name":"coin_weight",        "type":"uint32"}
          ]
       },
       {
@@ -441,6 +442,24 @@
                "type":"account_name"
             }
          ]
+      },
+      {
+         "name":"setweight",
+         "base":"",
+         "fields":[
+            {
+               "name":"chain",
+               "type":"name"
+            },
+            {
+               "name":"coin",
+               "type":"asset"
+            },
+            {
+               "name":"weight",
+               "type":"uint32"
+            }
+         ]
       }
    ],
    "actions":[
@@ -497,6 +516,11 @@
       {
          "name":"activemine",
          "type":"activemine",
+         "ricardian_contract":""
+      },
+      {
+         "name":"setweight",
+         "type":"setweight",
          "ricardian_contract":""
       }
    ],
