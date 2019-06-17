@@ -832,7 +832,7 @@ namespace exchange {
                quant_after_fee = to_asset(relay_token_acc, itr1->quote_chain, itr1->quote_sym, quant_after_fee);
                //print("bid step2: quant_after_fee=",quant_after_fee);
                inline_transfer(escrow, end_itr->maker, itr1->quote_chain, quant_after_fee, "");
-               sub_balance(itr->maker, quant_after_fee);
+               sub_balance(end_itr->maker, quant_after_fee);
             }
             if (full_match) {
                if( deal_base < end_itr->base ) {
