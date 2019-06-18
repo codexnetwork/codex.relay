@@ -79,4 +79,9 @@ namespace eosiosystem {
 
       set_need_check_ram_limit(voter);
    }
+   
+   void system_contract::vote4ram2( const account_name voter, const account_name bpname, const asset stake ) {
+      freeze( voter, stake );
+      vote4ram( voter, bpname, stake );
+   }
 }
