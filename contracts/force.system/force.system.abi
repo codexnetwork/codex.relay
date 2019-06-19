@@ -496,6 +496,10 @@
       "type": "vote",
       "ricardian_contract": ""
     },{
+      "name": "vote4ram2",
+      "type": "vote",
+      "ricardian_contract": ""
+    },{
       "name": "voteproducer",
       "type": "voteproducer",
       "ricardian_contract": ""

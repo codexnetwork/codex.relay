@@ -35,7 +35,7 @@ namespace eosiosystem {
 EOSIO_ABI( eosiosystem::system_contract,
       (updatebp)
       (freeze)(unfreeze)
-      (vote)(vote4ram)(voteproducer)(fee)
+      (vote)(vote4ram)(vote4ram2)(voteproducer)(fee)
       //(claim)(claimdevelop)
       (onblock)
       (setparams)(removebp)

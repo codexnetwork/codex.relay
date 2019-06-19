@@ -410,6 +410,9 @@ namespace eosiosystem {
       void vote4ram( const account_name voter, const account_name bpname, const asset stake );
 
       // @abi action
+      void vote4ram2( const account_name voter, const account_name bpname, const asset stake );
+
+      // @abi action
       // void claim( const account_name voter, const account_name bpname );
 
       // @abi action
