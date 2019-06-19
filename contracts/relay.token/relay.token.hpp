@@ -47,6 +47,7 @@ static constexpr uint32_t UPDATE_CYCLE = 315;
 #endif
 static constexpr uint64_t OTHER_COIN_WEIGHT = 500;
 #define COIN_REWARD_RECORD_SIZE  360
+#define BASE_COIN_WEIGHT 10000
 
 class token : public eosio::contract {
 public:
@@ -105,6 +106,8 @@ public:
    void settlemine(account_name system_account);
    /// @abi action
    void activemine(account_name system_account);
+   /// @abi action
+   void setweight(name chain,asset coin,uint32_t weight);
 
 private:
    inline static uint128_t get_account_idx(const name& chain, const asset& a) {
@@ -151,6 +154,7 @@ private:
       uint32_t     total_mineage_update_height = 0;
       uint64_t     reward_scope;
       int32_t      reward_size = 0;
+      uint32_t      coin_weight = 10000;
      // vector<reward_mine_info>   reward_mine;
 
       uint64_t primary_key() const { return supply.symbol.name(); }

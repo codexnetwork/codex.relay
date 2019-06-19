@@ -323,6 +323,7 @@ namespace eosiosystem {
          uint32_t     total_mineage_update_height = 0;
          uint64_t     reward_scope;
          int32_t      reward_size = 0;
+         uint32_t     coin_weight = 0;
          //vector<reward_mine_info>   reward_mine;
 
          uint64_t primary_key() const { return supply.symbol.name(); }

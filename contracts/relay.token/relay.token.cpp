@@ -85,6 +85,7 @@ void token::create( account_name issuer,
       s.total_mineage_update_height = current_block_num();
       s.reward_scope = asset::max_amount;
       s.reward_size = 0;
+      s.coin_weight = BASE_COIN_WEIGHT;
    });
 
 
@@ -298,7 +299,7 @@ void token::trade( account_name from,
 }
 
 void token::addreward(name chain,asset supply,int32_t reward_now) {
-   require_auth(_self);
+   require_auth(::config::system_account_name);
 
    auto sym = supply.symbol;
    eosio_assert(sym.is_valid(), "invalid symbol name");
@@ -358,7 +359,7 @@ void token::rewardmine(asset quantity) {
       auto price = t.get_avg_price(current_block_num(),existing->chain,existing->supply.symbol).amount;
       reward_mine reward_inf(_self,existing->reward_scope);
       auto reward_info = reward_inf.find(current_block);
-      total_power += reward_info->total_mineage * price / precision(existing->supply.symbol.precision()) ;
+      total_power += reward_info->total_mineage * price / precision(existing->supply.symbol.precision()) * existing->coin_weight / BASE_COIN_WEIGHT ;
    }
 
    if (total_power == 0) return ;
@@ -369,11 +370,21 @@ void token::rewardmine(asset quantity) {
       auto price = t.get_avg_price(current_block_num(),existing->chain,existing->supply.symbol).amount;
       reward_mine reward_inf(_self,existing->reward_scope);
       auto reward_info = reward_inf.find(current_block);
-      uint128_t devide_amount =  reward_info->total_mineage * price / precision(existing->supply.symbol.precision())* quantity.amount  / total_power;
+      uint128_t devide_amount =  reward_info->total_mineage * price / precision(existing->supply.symbol.precision())* quantity.amount  / total_power * existing->coin_weight / BASE_COIN_WEIGHT;
       reward_inf.modify(reward_info,0,[&]( auto& s ) {
          s.reward_pool = asset(devide_amount);
       });
    }
+}
+
+void token::setweight(name chain,asset coin,uint32_t weight) {
+   require_auth(::config::system_account_name);
+   stats statstable(_self, chain);
+   auto existing = statstable.find(coin.symbol.name());
+   eosio_assert(existing != statstable.end(), "token with symbol do not exists");
+   statstable.modify(*existing, 0, [&]( auto& s ) {
+      s.coin_weight = weight;
+   });
 }
 
 void token::settlemine(account_name system_account) {
@@ -546,4 +557,4 @@ void sys_bridge_exchange::parse(const string memo) {
 
 };
 
-EOSIO_ABI(relay::token, (on)(create)(issue)(destroy)(transfer)(trade)(rewardmine)(addreward)(claim)(settlemine)(activemine))
+EOSIO_ABI(relay::token, (on)(create)(issue)(destroy)(transfer)(trade)(rewardmine)(addreward)(claim)(settlemine)(activemine)(setweight))
