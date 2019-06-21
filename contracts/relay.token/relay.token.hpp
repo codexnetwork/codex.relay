@@ -88,6 +88,7 @@ public:
                   string memo );
    
    inline asset get_supply( name chain, symbol_name sym )const;
+   inline asset get_current_balance(account_name owner, name chain,asset destcoin)const;
    /// @abi action
    void trade( account_name from,
                account_name to,
@@ -202,6 +203,15 @@ public:
       stats statstable( _self, chain );
       const auto& st = statstable.get( sym );
       return st.supply;
+   }
+
+   asset token::get_current_balance(account_name owner, name chain,asset destcoin)const
+   {
+      accounts from_acnts(_self, owner);
+      auto idx = from_acnts.get_index<N(bychain)>();
+      auto from = idx.get(get_account_idx(chain, destcoin), "no balance object found");
+      eosio_assert(from.chain == chain, "symbol chain mismatch");
+      return from.balance;
    }
 
 };
