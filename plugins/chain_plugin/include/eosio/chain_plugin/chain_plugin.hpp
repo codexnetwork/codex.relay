@@ -314,6 +314,15 @@ public:
 
    vector<asset> get_currency_balance( const get_currency_balance_params& params )const;
 
+   struct get_relay_currency_balance_params {
+      name             code;
+      name             account;
+      optional<string> chain;
+      optional<string> symbol;
+   };
+
+   vector<asset> get_relay_currency_balance( const get_relay_currency_balance_params& params )const;
+
    struct get_currency_stats_params {
       name           code;
       string         symbol;
@@ -725,6 +734,7 @@ FC_REFLECT( eosio::chain_apis::read_only::get_table_by_scope_result_row, (code)(
 FC_REFLECT( eosio::chain_apis::read_only::get_table_by_scope_result, (rows)(more) );
 
 FC_REFLECT( eosio::chain_apis::read_only::get_currency_balance_params, (code)(account)(symbol));
+FC_REFLECT( eosio::chain_apis::read_only::get_relay_currency_balance_params, (code)(account)(chain)(symbol));
 FC_REFLECT( eosio::chain_apis::read_only::get_currency_stats_params, (code)(symbol));
 FC_REFLECT( eosio::chain_apis::read_only::get_currency_stats_result, (supply)(max_supply)(issuer));
 

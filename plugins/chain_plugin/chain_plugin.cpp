@@ -1264,7 +1264,6 @@ read_only::get_table_by_scope_result read_only::get_table_by_scope( const read_o
 }
 
 vector<asset> read_only::get_currency_balance( const read_only::get_currency_balance_params& p )const {
-
    const abi_def abi = eosio::chain_apis::get_abi( db, p.code );
    (void)get_table_type( abi, "accounts" );
 
@@ -1284,6 +1283,32 @@ vector<asset> read_only::get_currency_balance( const read_only::get_currency_bal
 
       // return false if we are looking for one and found it, true otherwise
       return !(p.symbol && boost::iequals(cursor.symbol_name(), *p.symbol));
+   });
+
+   return results;
+}
+
+vector<asset> read_only::get_relay_currency_balance( const get_relay_currency_balance_params& p )const {
+   const abi_def abi = eosio::chain_apis::get_abi( db, p.code );
+   (void)get_table_type( abi, "accounts" );
+   vector<asset> results;
+   walk_key_value_table(p.code, p.account, N(accounts), [&](const key_value_object& obj){
+      uint64_t id;
+      asset balance;
+      name  chain;
+      fc::datastream<const char *> ds(obj.value.data(), obj.value.size());
+      fc::raw::unpack(ds, id);
+      fc::raw::unpack(ds, balance);
+      fc::raw::unpack(ds, chain);
+
+      EOS_ASSERT( balance.get_symbol().valid(), chain::asset_type_exception, "Invalid asset");
+
+      if (boost::iequals(chain.to_string() , *p.chain) && boost::iequals(balance.symbol_name(), *p.symbol)) {
+         results.emplace_back(balance);
+      }
+
+      // return false if we are looking for one and found it, true otherwise
+      return !(boost::iequals(chain.to_string() , *p.chain) && boost::iequals(balance.symbol_name(), *p.symbol));
    });
 
    return results;

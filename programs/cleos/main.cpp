@@ -2866,6 +2866,28 @@ int main( int argc, char** argv ) {
                    << std::endl;
       }
    });
+   string relay_chain;
+   auto get_relay_currency = get->add_subcommand( "relaycurrency", localized("Retrieve information related to relay currencies"), true);
+   get_relay_currency->require_subcommand();
+   auto get_relay_balance = get_relay_currency->add_subcommand( "balance", localized("Retrieve the balance of an account for a given currency"), false);
+   get_relay_balance->add_option( "contract", code, localized("The contract that operates the currency") )->required();
+   get_relay_balance->add_option( "account", accountName, localized("The account to query balances for") )->required();
+   get_relay_balance->add_option( "chain", relay_chain, localized("The chain where the coin from") )->required();
+   get_relay_balance->add_option( "symbol", symbol, localized("The symbol for the currency if the contract operates multiple currencies") );
+   get_relay_balance->set_callback([&] {
+      auto result = call(get_relay_currency_balance_func, fc::mutable_variant_object
+         ("account", accountName)
+         ("code", code)
+         ("chain",relay_chain)
+         ("symbol", symbol.empty() ? fc::variant() : symbol)
+      );
+
+      const auto& rows = result.get_array();
+      for( const auto& r : rows ) {
+         std::cout << r.as_string()
+                   << std::endl;
+      }
+   });
 
    auto get_currency_stats = get_currency->add_subcommand( "stats", localized("Retrieve the stats of for a given currency"), false);
    get_currency_stats->add_option( "contract", code, localized("The contract that operates the currency") )->required();
