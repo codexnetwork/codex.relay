@@ -95,10 +95,13 @@ void token::castcoin( account_name from,
 
    eosio_assert( is_account( to ), "to account does not exist");
    coincasts coincast_table( _self, to );
-   auto current_block = current_block_num();
-   int32_t cast_num = PRE_CAST_NUM - static_cast<int32_t>(current_block / WEAKEN_CAST_NUM);
-   if (cast_num < static_cast<int32_t>(STABLE_CAST_NUM)) cast_num = STABLE_CAST_NUM;
-   auto finish_block = current_block + cast_num;
+
+   const auto current_block = current_block_num();
+   auto cast_num = PRE_CAST_NUM - static_cast<uint32_t>(static_cast<double>(current_block) / WEAKEN_CAST_NUM);
+   if (cast_num < STABLE_CAST_NUM) {
+      cast_num = STABLE_CAST_NUM;
+   }
+   const auto finish_block = current_block + cast_num;
    const auto cc = coincast_table.find( static_cast<uint64_t>(finish_block) );
 
    require_recipient( from );
@@ -114,24 +117,26 @@ void token::castcoin( account_name from,
 
    coincast_table.modify( cc, to, [&]( auto& a ) {
       a.balance += quantity;
-   });
+   } );
 }
 void token::takecoin(account_name to) {
    require_auth( to );
+
    coincasts coincast_table( _self, to );
-   auto current_block = current_block_num();
-   vector<uint32_t>  finish_block;
-   asset finish_coin = asset(0);
-   finish_block.clear();
-   for( auto it = coincast_table.cbegin(); it != coincast_table.cend(); ++it ) {
-      if(it->finish_block < current_block) {
-         finish_block.push_back(it->finish_block);
-         finish_coin += it->balance;
+   const auto current_block = current_block_num();
+   vector<uint32_t> finish_block;
+   asset finish_coin = asset{0};
+
+   finish_block.reserve(64);
+   for( const auto& cc : coincast_table ) {
+      if( cc.finish_block < current_block ) {
+         finish_block.push_back(cc.finish_block);
+         finish_coin += cc.balance;
       }
    }
+
    add_balance( to, finish_coin, to );
-   for (auto val : finish_block)
-   {
+   for( const auto& val : finish_block ) {
       const auto cc = coincast_table.find( static_cast<uint64_t>(val) );
       if (cc != coincast_table.end()) {
          coincast_table.erase(cc);
@@ -144,15 +149,19 @@ void token::opencast(account_name to) {
 
    eosio_assert( is_account( to ), "to account does not exist");
    coincasts coincast_table( _self, to );
-   auto current_block = current_block_num();
-   int32_t cast_num = PRE_CAST_NUM - static_cast<int32_t>(current_block / WEAKEN_CAST_NUM);
-   if (cast_num < static_cast<int32_t>(STABLE_CAST_NUM)) cast_num = STABLE_CAST_NUM;
-   auto finish_block = current_block + cast_num;
+
+   const auto current_block = current_block_num();
+   auto cast_num = PRE_CAST_NUM - static_cast<uint32_t>(current_block / WEAKEN_CAST_NUM);
+   if (cast_num < STABLE_CAST_NUM) {
+      cast_num = STABLE_CAST_NUM;
+   }
+
+   const auto finish_block = current_block + cast_num;
    const auto cc = coincast_table.find( static_cast<uint64_t>(finish_block) );
 
    eosio_assert(cc == coincast_table.end(),"the cast is been opened");
    coincast_table.emplace( to, [&]( auto& a ){
-         a.balance = asset(0);
+         a.balance      = asset{0};
          a.finish_block = finish_block;
       });
 }
