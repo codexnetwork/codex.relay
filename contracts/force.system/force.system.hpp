@@ -21,8 +21,9 @@ namespace eosiosystem {
    using eosio::print;
    using eosio::bytes;
    using eosio::block_timestamp;
-   using std::string;
    using eosio::permission_level;
+
+   using std::string;
    using std::vector;
 
    struct permission_level_weight {
@@ -40,8 +41,6 @@ namespace eosiosystem {
       weight_type  weight;
    };
 
-
-
    struct authority {
       uint32_t                          threshold = 0;
       vector<key_weight>                keys;
@@ -52,11 +51,9 @@ namespace eosiosystem {
    class system_contract : private eosio::contract {
    public:
       system_contract( account_name self )
-         : contract(self)
-         , _voters(_self, _self) {}
+         : contract(self) {}
 
    private:
-
       struct vote_info {
          asset        vote                  = asset{0};
          account_name bpname                = 0;
@@ -67,16 +64,6 @@ namespace eosiosystem {
          uint64_t primary_key() const { return bpname; }
 
          EOSLIB_SERIALIZE(vote_info, (bpname)(vote)(voteage)(voteage_update_height)(total_reward))
-      };
-
-      struct votes_info {
-         account_name                owner = 0; /// the voter
-         std::vector<account_name>   producers; /// the producers approved by this voter
-         asset                       staked;    /// the staked to this producers
-
-         uint64_t primary_key()const { return owner; }
-
-         EOSLIB_SERIALIZE( votes_info, (owner)(producers)(staked) )
       };
 
       struct freeze_info {
@@ -258,10 +245,8 @@ namespace eosiosystem {
          eosio::indexed_by< N(bychain),
                      eosio::const_mem_fun<reward_currency, uint128_t, &reward_currency::get_index_i128 >>> rewards;
       typedef eosio::multi_index<N(minereward), reward_mine_info> reward_mine ;
-      /** from relay.token end*/
       typedef eosio::multi_index<N(freezed),     freeze_info>   freeze_table;
       typedef eosio::multi_index<N(votes),       vote_info>     votes_table;
-      typedef eosio::multi_index<N(mvotes),      votes_info>    mvotes_table;
       typedef eosio::multi_index<N(votes4ram),   vote_info>     votes4ram_table;
       typedef eosio::multi_index<N(vote4ramsum), vote4ram_info> vote4ramsum_table;
       typedef eosio::multi_index<N(bps),         bp_info>       bps_table;
@@ -272,8 +257,6 @@ namespace eosiosystem {
       typedef eosio::multi_index<N(punishbps),   punish_bp_info> punish_bps;
       typedef eosio::multi_index<N(apppunishbps),   approve_punish_bp> approve_punish_bps;
       typedef eosio::multi_index<N(votereward),   vote_reward_info> bp_vote_reward;
-
-      mvotes_table _voters;
 
       //reward_info reward;
       void init_creation_bp();
@@ -292,8 +275,6 @@ namespace eosiosystem {
       //defind in delegate_bandwidth.cpp
       void changebw( account_name from, account_name receiver,
                       asset stake_net_quantity, asset stake_cpu_quantity, bool transfer );
-
-      void update_votes( const account_name voter, const std::vector<account_name>& producers, bool voting );
 
       void reset_block_weight(account_name block_producers[]);
       int128_t get_coin_power();
@@ -386,9 +367,6 @@ namespace eosiosystem {
       void refund( account_name owner );
 #endif
 
-      // @abi action
-      void voteproducer( const account_name voter, const std::vector<account_name>& producers );
-      
       // @abi action
       void fee( const account_name payer, const account_name bpname, int64_t voteage );
       // @abi action

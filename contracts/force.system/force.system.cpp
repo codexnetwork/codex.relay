@@ -9,7 +9,7 @@
 #if CONTRACT_RESOURCE_MODEL == RESOURCE_MODEL_DELEGATE
 #include "delegate_bandwidth.cpp"
 #endif
-#include "multiple_vote.cpp"
+
 
 namespace eosiosystem {
    void system_contract::setparams( const eosio::blockchain_parameters& params ) {
@@ -35,7 +35,7 @@ namespace eosiosystem {
 EOSIO_ABI( eosiosystem::system_contract,
       (updatebp)
       (freeze)(unfreeze)
-      (vote)(vote4ram)(vote4ram2)(voteproducer)(fee)
+      (vote)(vote4ram)(vote4ram2)(fee)
       //(claim)(claimdevelop)
       (onblock)
       (setparams)(removebp)

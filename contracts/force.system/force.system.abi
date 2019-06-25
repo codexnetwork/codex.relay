@@ -47,13 +47,6 @@
         {"name":"stake",     "type":"asset"}
       ]
     },{
-      "name": "voteproducer",
-      "base": "",
-      "fields": [
-        {"name":"voter",     "type":"account_name"},
-        {"name":"producers", "type":"account_name[]"}
-      ]
-    },{
       "name": "vote_info",
       "base": "",
       "fields": [
@@ -62,14 +55,6 @@
         {"name":"voteage",               "type":"int64"},
         {"name":"voteage_update_height", "type":"uint32"},
         {"name":"total_reward", "type":"asset"}
-      ]
-    },{
-      "name": "votes_info",
-      "base": "",
-      "fields": [
-        {"name":"owner",     "type":"account_name"},
-        {"name":"producers", "type":"account_name[]"},
-        {"name":"staked",    "type":"asset"}
       ]
     },{
       "name": "freeze_info",
@@ -500,10 +485,6 @@
       "type": "vote",
       "ricardian_contract": ""
     },{
-      "name": "voteproducer",
-      "type": "voteproducer",
-      "ricardian_contract": ""
-    },{
       "name": "setemergency",
       "type": "setemergency",
       "ricardian_contract": ""
@@ -627,12 +608,6 @@
           "type":"vote_info",
           "index_type":"i64",
           "key_names": ["bpname"],
-          "key_types": ["account_name"]
-       },{
-          "name":"mvotes",
-          "type":"votes_info",
-          "index_type":"i64",
-          "key_names": ["owner"],
           "key_types": ["account_name"]
        },{
           "name":"votes4ram",
