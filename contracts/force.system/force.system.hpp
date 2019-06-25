@@ -103,10 +103,10 @@ namespace eosiosystem {
          int64_t  block_weight      = BLOCK_OUT_WEIGHT;
          asset    mortgage          = asset(0);
 
-         int32_t total_drain_block       = 0;
-         asset   remain_punish           = asset(0);
-         int32_t active_change_block_num = 0;
-         int32_t reward_size             = 0;
+         uint32_t total_drain_block       = 0;
+         asset   remain_punish            = asset(0);
+         uint32_t active_change_block_num = 0;
+         int32_t reward_size              = 0;
 
          uint64_t primary_key() const { return name; }
 
@@ -187,8 +187,8 @@ namespace eosiosystem {
       struct punish_bp_info {
          account_name initiator        = 0;
          account_name bpname           = 0;
-         int32_t      drain_num        = 0;
-         int32_t      update_block_num = 0;
+         uint32_t     drain_num        = 0;
+         uint32_t     update_block_num = 0;
 
          uint64_t primary_key() const { return bpname; }
 
@@ -198,8 +198,8 @@ namespace eosiosystem {
 
       struct last_drain_block {
          account_name bpname           = 0;
-         int32_t      drain_num        = 0;
-         int32_t      update_block_num = 0;
+         uint32_t     drain_num        = 0;
+         uint32_t     update_block_num = 0;
 
          uint64_t primary_key() const { return bpname; }
 
@@ -285,7 +285,7 @@ namespace eosiosystem {
       bool is_super_bp( account_name block_producers[], account_name name );
 
       bool is_super_bp( account_name bpname);
-      int32_t effective_approve_num(account_name punishbpname); 
+      uint32_t effective_approve_num( account_name punish_bpname ); 
       void exec_punish_bp(account_name punishbpname);
 
       //defind in delegate_bandwidth.cpp

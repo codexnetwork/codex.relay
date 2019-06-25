@@ -137,9 +137,9 @@ public:
       int64_t      block_weight = 0;   //换届如何清零?
       asset        mortgage = asset(0);
 
-      int32_t     total_drain_block = 0;
+      uint32_t    total_drain_block = 0;
       asset       remain_punish = asset(0);
-      int32_t     active_change_block_num = 0;
+      uint32_t     active_change_block_num = 0;
       int32_t     reward_size = 0;
 
       bp_info() : commission_rate(0) {

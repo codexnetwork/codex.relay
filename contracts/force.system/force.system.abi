@@ -77,23 +77,23 @@
       "name": "bp_info",
       "base": "",
       "fields": [
-        {"name":"name",                 "type":"account_name"},
-        {"name":"block_signing_key",    "type":"public_key"},
-        {"name":"commission_rate",      "type":"uint32"},
-        {"name":"total_staked",         "type":"int64"},
-        {"name":"rewards_block",         "type":"asset"},
-        {"name":"total_voteage",        "type":"int64"},
-        {"name":"voteage_update_height","type":"uint32"},
-        {"name":"url",                  "type":"string"},
-        {"name":"emergency",            "type":"bool"},
+        {"name":"name",                    "type":"account_name"},
+        {"name":"block_signing_key",       "type":"public_key"},
+        {"name":"commission_rate",         "type":"uint32"},
+        {"name":"total_staked",            "type":"int64"},
+        {"name":"rewards_block",           "type":"asset"},
+        {"name":"total_voteage",           "type":"int64"},
+        {"name":"voteage_update_height",   "type":"uint32"},
+        {"name":"url",                     "type":"string"},
+        {"name":"emergency",               "type":"bool"},
         {"name":"active_type",             "type":"int32"},
-        {"name":"block_age",            "type":"int64"},
-        {"name":"last_block_amount",    "type":"uint32"},
-        {"name":"block_weight",    "type":"int64"},
-        {"name":"bp_mortgageage",               "type":"asset"},
-        {"name":"total_drain_block",             "type":"int32"},
-        {"name":"remain_punish",             "type":"asset"},
-        {"name":"active_change_block_num",             "type":"int32"},
+        {"name":"block_age",               "type":"int64"},
+        {"name":"last_block_amount",       "type":"uint32"},
+        {"name":"block_weight",            "type":"int64"},
+        {"name":"bp_mortgageage",          "type":"asset"},
+        {"name":"total_drain_block",       "type":"uint32"},
+        {"name":"remain_punish",           "type":"asset"},
+        {"name":"active_change_block_num", "type":"uint32"},
         {"name":"reward_size",             "type":"int32"}
       ]
     },{
@@ -398,18 +398,18 @@
          "name": "punish_bp_info",
          "base": "",
          "fields": [
-            {"name":"initiator",                "type":"account_name"},
-            {"name":"bpname",                "type":"account_name"},
-            {"name":"drain_num",   "type":"int32"},
-            {"name":"update_block_num",   "type":"int32"}
+            {"name":"initiator",         "type":"account_name"},
+            {"name":"bpname",            "type":"account_name"},
+            {"name":"drain_num",         "type":"uint32"},
+            {"name":"update_block_num",  "type":"uint32"}
          ]
        },{
          "name": "last_drain_block",
          "base": "",
          "fields": [
-            {"name":"bpname",                "type":"account_name"},
-            {"name":"drain_num",   "type":"int32"},
-            {"name":"update_block_num",   "type":"int32"}
+            {"name":"bpname",           "type":"account_name"},
+            {"name":"drain_num",        "type":"uint32"},
+            {"name":"update_block_num", "type":"uint32"}
          ]
        },{
          "name": "approve_punish_bp",

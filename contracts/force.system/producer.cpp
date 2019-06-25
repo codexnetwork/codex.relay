@@ -293,7 +293,9 @@ namespace eosiosystem {
             continue;
          }
          auto drain_block_num = CYCLE_PREBP_BLOCK + bp->last_block_amount - sch->producers[i].amount;
-         if (force_change) drain_block_num = 0;
+         if (force_change) {
+            drain_block_num = 0;
+         }
          bps_tbl.modify(bp, 0, [&]( bp_info& b ) {
             b.block_age +=  (sch->producers[i].amount >= b.last_block_amount ? sch->producers[i].amount - b.last_block_amount : sch->producers[i].amount) * b.block_weight;
             total_block_out_age += (sch->producers[i].amount >= b.last_block_amount ? sch->producers[i].amount - b.last_block_amount : sch->producers[i].amount) * b.block_weight;
@@ -606,21 +608,26 @@ namespace eosiosystem {
       return false;
    }
 
-   int32_t system_contract::effective_approve_num(account_name punishbpname) {
-      punish_bps punish_bp(_self,_self);
-      auto bp_punish = punish_bp.find(punishbpname);
-      eosio_assert(bp_punish != punish_bp.end(), "the bp is not be punish");
+   uint32_t system_contract::effective_approve_num( account_name punish_bpname ) {
+      punish_bps punish_bp( _self, _self );
 
-      approve_punish_bps app_punish_bp(_self,_self);
-      auto app_punish = app_punish_bp.find(punishbpname);
-      eosio_assert(app_punish != app_punish_bp.end(), "no producer approve to punish the bp");
+      const auto bp_punish = punish_bp.find( punish_bpname );
+      eosio_assert( bp_punish != punish_bp.end(), "the bp is not be punish" );
 
-      schedules_table schs_tbl(_self, _self);
+      approve_punish_bps app_punish_bp( _self, _self );
+      const auto app_punish = app_punish_bp.find( punish_bpname );
+      eosio_assert( app_punish != app_punish_bp.end(), "no producer approve to punish the bp" );
+
+      schedules_table schs_tbl( _self, _self );
       auto producer_schs = schs_tbl.crbegin();
-      int32_t i = 0,j = 0,result = 0;
-      for (i=0;i!=app_punish->approve_producer.size();++i) {
-         for (j=0;j!=NUM_OF_TOP_BPS;++j) {
-            if (producer_schs->producers[j].bpname == app_punish->approve_producer[i]) {
+
+      uint32_t result = 0;
+
+      // FIXME: Need refactor
+      int32_t i = 0, j = 0;
+      for( i = 0; i != app_punish->approve_producer.size(); ++i ) {
+         for( j = 0; j < NUM_OF_TOP_BPS; ++j ) {
+            if( producer_schs->producers[j].bpname == app_punish->approve_producer[i] ) {
                result++;
                break;
             }
@@ -630,57 +637,66 @@ namespace eosiosystem {
       return result;
    }
 
-   void system_contract::exec_punish_bp(account_name punishbpname) {
-      auto effective_approve = effective_approve_num(punishbpname);
-      if (effective_approve < NUM_OF_TOP_BPS * 2 / 3) {
-         print("Need confirmation from other producers to punish the bp");
-         return ;
+   void system_contract::exec_punish_bp( account_name punishbpname ) {
+      // FIXME: need delete all print
+      const auto effective_approve = effective_approve_num( punishbpname );
+      if( effective_approve < NUM_OF_TOP_BPS * 2 / 3 ) {
+         print( "Need confirmation from other producers to punish the bp" );
+         return;
       }
 
-      bps_table bps_tbl(_self, _self);
-      auto punishbp = bps_tbl.find(punishbpname);
-      if (punishbp == bps_tbl.end()) {
-         print("can not find punish bp");
-         return ;
+      bps_table bps_tbl( _self, _self );
+      const auto punishbp = bps_tbl.find( punishbpname );
+      if( punishbp == bps_tbl.end() ) {
+         print( "can not find punish bp" );
+         return;
       }
 
       auto total_reward = punishbp->remain_punish;
-      bps_tbl.modify(punishbp, _self, [&]( bp_info& b ) {
-         b.remain_punish = asset{0,CORE_SYMBOL};
-         b.active_type = static_cast<int32_t>(active_type::Punish);
+      bps_tbl.modify( punishbp, _self, [&]( bp_info& b ) {
+         b.remain_punish = asset{ 0, CORE_SYMBOL };
+         b.active_type = static_cast<int32_t>( active_type::Punish );
          b.active_change_block_num = current_block_num();
-      });
+      } );
 
-      auto reward_initiator = total_reward / 2;
+      const auto reward_initiator = total_reward / 2;
 
-      punish_bps punish_bp(_self,_self);
-      auto bp_punish = punish_bp.find(punishbpname);
-      eosio_assert(bp_punish != punish_bp.end(), "the bp is not be punish");
-      INLINE_ACTION_SENDER(force::token, transfer)(
-         config::token_account_name,
-         { ::config::system_account_name, N(active) },
-         { ::config::system_account_name, bp_punish->initiator, reward_initiator + PUNISH_BP_FEE, "cancle punishbp deposit" });
-      punish_bp.erase(bp_punish);
+      punish_bps punish_bp( _self, _self );
+      auto bp_punish = punish_bp.find( punishbpname );
+      eosio_assert( bp_punish != punish_bp.end(), "the bp is not be punish" );
+      INLINE_ACTION_SENDER( force::token, transfer )
+      ( config::token_account_name,
+        { config::system_account_name, N( active ) },
+        { config::system_account_name,
+          bp_punish->initiator,
+          reward_initiator + PUNISH_BP_FEE,
+          "cancle punishbp deposit" } );
+      punish_bp.erase( bp_punish );
 
-      auto reward_approve = total_reward / 2 / effective_approve;
-      approve_punish_bps app_punish_bp(_self,_self);
-      auto app_punish = app_punish_bp.find(punishbpname);
-      eosio_assert(app_punish != app_punish_bp.end(), "no producer approve to punish the bp");
-      auto iSize = app_punish->approve_producer.size();
-      for(int i=0;i!=iSize;++i) {
-         if (is_super_bp(app_punish->approve_producer[i])) {
-            INLINE_ACTION_SENDER(force::token, transfer)(
-               config::token_account_name,
-               { ::config::system_account_name, N(active) },
-               { ::config::system_account_name, app_punish->approve_producer[i], reward_approve, "cancle punishbp deposit" });
+      const auto reward_approve = reward_initiator / effective_approve;
+
+      approve_punish_bps app_punish_bp( _self, _self );
+      const auto app_punish = app_punish_bp.find( punishbpname );
+      eosio_assert( app_punish != app_punish_bp.end(), "no producer approve to punish the bp" );
+
+      for( const auto& ap : app_punish->approve_producer ) {
+         if( is_super_bp( ap ) ) {
+            INLINE_ACTION_SENDER( force::token, transfer )
+            ( config::token_account_name,
+              { config::system_account_name, N( active ) },
+              { config::system_account_name,
+                ap,
+                reward_approve,
+                "cancle punishbp deposit" } );
          }
       }
-      app_punish_bp.erase(app_punish);
 
-      last_drain_bp drain_bp_tbl(_self,_self);
-      auto drainbp = drain_bp_tbl.find(punishbpname); 
-      if (drainbp != drain_bp_tbl.end()) {
-         drain_bp_tbl.erase(drainbp);
+      app_punish_bp.erase( app_punish );
+
+      last_drain_bp drain_bp_tbl( _self, _self );
+      const auto drain_bp = drain_bp_tbl.find( punishbpname );
+      if( drain_bp != drain_bp_tbl.end() ) {
+         drain_bp_tbl.erase( drain_bp );
       }
    }
 
@@ -736,11 +752,11 @@ namespace eosiosystem {
       eosio_assert(bp_punish != punish_bp.end(), "the bp is not be punish");
       eosio_assert(initiator == bp_punish->initiator,"only the initiator can cancle the punish proposal");
       
-      if ( bp_punish->update_block_num < static_cast<int32_t>(current_block_num() - UPDATE_CYCLE * CYCLE_PREDAY)) {
+      if ( bp_punish->update_block_num < (current_block_num() - (UPDATE_CYCLE * CYCLE_PREDAY))) {
          INLINE_ACTION_SENDER(force::token, transfer)(
-            ::config::token_account_name,
-            { ::config::system_account_name, N(active) },
-            { ::config::system_account_name, initiator, PUNISH_BP_FEE, "cancle punishbp return deposit" });
+            config::token_account_name,
+            { config::system_account_name, N(active) },
+            { config::system_account_name, initiator, PUNISH_BP_FEE, "cancle punishbp return deposit" });
       }
       
       punish_bp.erase(bp_punish);
@@ -760,7 +776,7 @@ namespace eosiosystem {
       punish_bps punish_bp(_self,_self);
       auto bp_punish = punish_bp.find(punishbpname);
       eosio_assert(bp_punish != punish_bp.end(), "the bp is not be punish");
-      eosio_assert(bp_punish->update_block_num > static_cast<int32_t>(current_block_num() - UPDATE_CYCLE * CYCLE_PREDAY), "the punish motion is already expired");
+      eosio_assert(bp_punish->update_block_num > (current_block_num() - (UPDATE_CYCLE * CYCLE_PREDAY)), "the punish motion is already expired");
 
       approve_punish_bps app_punish_bp(_self,_self);
       auto app_punish = app_punish_bp.find(punishbpname);
@@ -797,7 +813,7 @@ namespace eosiosystem {
       require_auth(punishbpname);
 
       INLINE_ACTION_SENDER(force::token, transfer)(
-         ::config::token_account_name,
+         config::token_account_name,
          { punishbpname, N(active) },
          { punishbpname, ::config::system_account_name, BAIL_PUNISH_FEE, "bail punish fee" });
 
@@ -806,7 +822,7 @@ namespace eosiosystem {
       eosio_assert(punishbp != bps_tbl.end(),"can not find bp");
 
       if (punishbp->active_type == static_cast<int32_t>(active_type::Punish) 
-         && punishbp->active_change_block_num + UPDATE_CYCLE*CYCLE_PREDAY*2 < current_block_num()) {
+         && (punishbp->active_change_block_num + (UPDATE_CYCLE*CYCLE_PREDAY*2)) < current_block_num()) {
          bps_tbl.modify(punishbp, _self, [&]( bp_info& b ) {
             b.active_type = static_cast<int32_t>(active_type::Normal);
          });
