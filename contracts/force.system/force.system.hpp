@@ -110,12 +110,6 @@ namespace eosiosystem {
 
          uint64_t primary_key() const { return name; }
 
-         inline void update( const public_key& key, uint32_t rate, const std::string& u ) {
-            block_signing_key = key;
-            commission_rate = rate;
-            url = u;
-         }
-
          inline void deactivate() {
             active_type = static_cast<int32_t>(active_type::Removed);
          }
