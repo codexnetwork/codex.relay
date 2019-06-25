@@ -43,6 +43,7 @@ namespace eosiosystem {
             reward = reward_inf.find(REWARD_ID);
          }
 
+         // FIXME: By FanYang change all useless current_block_num() call
          auto cycle_block_out = current_block_num() - reward->last_reward_block_num;
          int64_t block_rewards = reward->cycle_reward * cycle_block_out / UPDATE_CYCLE;
          auto reward_times = reward->total_reward_time + 1;

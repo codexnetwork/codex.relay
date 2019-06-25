@@ -115,9 +115,9 @@ public:
    };
 
    struct vote_reward_info {
-      int64_t total_voteage;
-      asset total_reward = asset(0);
-      int32_t  reward_block_num;
+      int64_t  total_voteage    = 0;
+      asset    total_reward     = asset{0};
+      uint32_t reward_block_num = 0;
    };
 
    struct bp_info {

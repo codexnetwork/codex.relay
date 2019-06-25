@@ -69,9 +69,9 @@
       "name": "vote_reward_info",
       "base": "",
       "fields": [
-        {"name":"total_voteage",         "type":"int64"},
-        {"name":"total_reward",      "type":"asset"},
-        {"name":"reward_block_num",          "type":"int32"}
+        {"name":"total_voteage",    "type":"int64"},
+        {"name":"total_reward",     "type":"asset"},
+        {"name":"reward_block_num", "type":"uint32"}
       ]
     },{
       "name": "bp_info",
@@ -337,16 +337,16 @@
          "name": "reward_info",
          "base": "",
          "fields": [
-            {"name":"id", "type":"uint64" },
+            {"name":"id",                    "type":"uint64" },
             {"name":"reward_block_out",      "type":"asset"},
-            {"name":"reward_budget",             "type":"asset"},
+            {"name":"reward_budget",         "type":"asset"},
             {"name":"total_block_out_age",   "type":"int64"},
             {"name":"cycle_reward",          "type":"int64"},
             {"name":"gradient",              "type":"int32"},
-            {"name":"total_reward_time",              "type":"int32"},
-            {"name":"last_reward_block_num",              "type":"int32"},
-            {"name":"last_producer_name",              "type":"account_name"},
-            {"name":"reward_block_num",              "type":"int32[]"}
+            {"name":"total_reward_time",     "type":"int32"},
+            {"name":"last_reward_block_num", "type":"uint32"},
+            {"name":"last_producer_name",    "type":"account_name"},
+            {"name":"reward_block_num",      "type":"uint32[]"}
          ]
        },{
          "name": "addmortgage",

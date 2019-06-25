@@ -146,13 +146,11 @@ namespace eosiosystem {
       };
 
       struct vote_reward_info {
-         int64_t total_voteage    = 0;
-         asset   total_reward     = asset{0};
+         int64_t total_voteage     = 0;
+         asset   total_reward      = asset{0};
+         uint32_t reward_block_num = 0;
 
-         // FIXME: By FanYang need to uint32_t
-         int32_t reward_block_num = 0;
-
-         uint64_t primary_key() const { return reward_block_num; }
+         uint64_t primary_key() const { return static_cast<uint64_t>(reward_block_num); }
       };
 
       struct reward_info {
@@ -163,14 +161,14 @@ namespace eosiosystem {
          int64_t      cycle_reward          = 0;
          int32_t      gradient              = 0;
          int32_t      total_reward_time     = 0;
-         int32_t      last_reward_block_num = 0;
+         uint32_t     last_reward_block_num = 0;
          account_name last_producer_name    = 0;
-         vector<int32_t> reward_block_num;
+         vector<uint32_t> reward_block_num;
 
          uint64_t primary_key() const { return id; }
 
          EOSLIB_SERIALIZE( reward_info, 
-                           ( id )(reward_block_out)(reward_budget)
+                           (id)(reward_block_out)(reward_budget)
                            (total_block_out_age)(cycle_reward)(gradient)
                            (total_reward_time)(last_reward_block_num)
                            (last_producer_name)(reward_block_num) )
@@ -223,17 +221,18 @@ namespace eosiosystem {
       }
 
       struct reward_mine_info {
-         int128_t total_mineage = 0;
-         asset    reward_pool = asset(0);
-         int32_t  reward_block_num = 0;
-         uint64_t primary_key() const { return reward_block_num; }
+         int128_t total_mineage    = 0;
+         asset    reward_pool      = asset{0};
+         uint32_t reward_block_num = 0;
+
+         uint64_t primary_key() const { return static_cast<uint64_t>(reward_block_num); }
       };
 
       struct currency_stats {
          asset        supply;
          asset        max_supply;
          account_name issuer;
-         eosio::name         chain;
+         eosio::name  chain;
 
          account_name side_account;
          action_name  side_action;
