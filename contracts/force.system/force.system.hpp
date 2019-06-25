@@ -89,24 +89,23 @@ namespace eosiosystem {
       struct bp_info {
          account_name name;
          public_key   block_signing_key;
-         uint32_t     commission_rate = 0; // 0 - CORE_SYMBOL_PRECISION for 0% - 100%
-         int64_t      total_staked    = 0;
-         asset        rewards_block   = asset(0);
-         int64_t      total_voteage   = 0; // asset.amount * block height
-         uint32_t     voteage_update_height = current_block_num();
+         uint32_t     commission_rate       = 0; // 0 - CORE_SYMBOL_PRECISION for 0% - 100%
+         int64_t      total_staked          = 0;
+         asset        rewards_block         = asset{0};
+         int64_t      total_voteage         = 0; // asset.amount * block height
+         uint32_t     voteage_update_height = 0;
          std::string  url;
-         bool         emergency = false;
+         bool         emergency             = false;
 
-         int32_t  active_type       = 0;
-         int64_t  block_age         = 0;
-         uint32_t last_block_amount = 0;
-         int64_t  block_weight      = BLOCK_OUT_WEIGHT;
-         asset    mortgage          = asset(0);
-
+         int32_t  active_type             = 0;
+         int64_t  block_age               = 0;
+         uint32_t last_block_amount       = 0;
+         int64_t  block_weight            = BLOCK_OUT_WEIGHT;
+         asset    mortgage                = asset{0};
          uint32_t total_drain_block       = 0;
-         asset   remain_punish            = asset(0);
+         asset    remain_punish           = asset{0};
          uint32_t active_change_block_num = 0;
-         int32_t reward_size              = 0;
+         int32_t  reward_size             = 0;
 
          uint64_t primary_key() const { return name; }
 
