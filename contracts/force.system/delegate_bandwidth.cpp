@@ -85,7 +85,7 @@ namespace eosiosystem {
 
 
    void system_contract::changebw( account_name from, account_name receiver,
-                                   const asset stake_net_delta, const asset stake_cpu_delta, bool transfer )
+                                   const asset& stake_net_delta, const asset& stake_cpu_delta, bool transfer )
    {
       require_auth( from );
       eosio_assert( stake_net_delta != asset(0) || stake_cpu_delta != asset(0), "should stake non-zero amount" );

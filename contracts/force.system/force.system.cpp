@@ -9,7 +9,7 @@
 #if CONTRACT_RESOURCE_MODEL == RESOURCE_MODEL_DELEGATE
 #include "delegate_bandwidth.cpp"
 #endif
-#include "multiple_vote.cpp"
+
 
 namespace eosiosystem {
    void system_contract::setparams( const eosio::blockchain_parameters& params ) {
@@ -18,7 +18,7 @@ namespace eosiosystem {
       set_blockchain_parameters( params );
    }
 
-    void system_contract::newaccount(account_name creator,account_name name,authority owner,authority active) {
+    void system_contract::newaccount(account_name, account_name name, authority, authority) {
 #if CONTRACT_RESOURCE_MODEL == RESOURCE_MODEL_DELEGATE
 
        user_resources_table  userres( _self, name);
@@ -35,7 +35,7 @@ namespace eosiosystem {
 EOSIO_ABI( eosiosystem::system_contract,
       (updatebp)
       (freeze)(unfreeze)
-      (vote)(vote4ram)(vote4ram2)(voteproducer)(fee)
+      (vote)(vote4ram)(vote4ram2)(fee)
       //(claim)(claimdevelop)
       (onblock)
       (setparams)(removebp)

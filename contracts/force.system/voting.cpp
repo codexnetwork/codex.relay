@@ -28,12 +28,6 @@ namespace eosiosystem {
                v.unstake_height =  curr_block_num;
             }
          });
-
-         // process multiple vote
-         auto mv = _voters.find(voter);
-         if((mv != _voters.end()) && (change != asset{})){
-            update_votes(voter, mv->producers, false);
-         }
       }
 
       if( change > asset{0} ) {
@@ -47,10 +41,6 @@ namespace eosiosystem {
    // vote vote to a bp from voter to bpname with stake EOSC
    void system_contract::vote( const account_name voter, const account_name bpname, const asset stake ) {
       require_auth(voter);
-
-#if IS_ACTIVE_MULTIPLE_VOTE
-      eosio_assert(false, "curr chain is active mutiple vote, no allow vote to simple bp");
-#endif
 
       creation_producer creation_bp_tbl(_self,_self);
       auto create_bp = creation_bp_tbl.find(bpname);

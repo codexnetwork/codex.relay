@@ -136,10 +136,11 @@ private:
    };
 
    struct reward_mine_info {
-      int128_t total_mineage = 0;
-      asset    reward_pool = asset(0);
-      int32_t  reward_block_num = 0;
-      uint64_t primary_key() const { return reward_block_num; }
+      int128_t total_mineage    = 0;
+      asset    reward_pool      = asset{0};
+      uint32_t reward_block_num = 0;
+
+      uint64_t primary_key() const { return static_cast<uint64_t>(reward_block_num); }
    };
 
    struct currency_stats {

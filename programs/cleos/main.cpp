@@ -4133,12 +4133,7 @@ int main( int argc, char** argv ) {
   
    auto registerProducer = update_bp_subcommand(system);
 
-   auto voteProducer = system->add_subcommand("voteproducer", localized("Vote for a producer"));
-   voteProducer->require_subcommand();
-   auto vote = vote_producer_vote_subcommand(voteProducer);
-   auto voteList = vote_producer_list_subcommand(voteProducer);
-   auto claim = vote_producer_claim_subcommand(voteProducer);
-   auto unfreeze = vote_producer_unfreeze_subcommand(voteProducer);
+
    //auto listProducers = list_producers_subcommand(system);
 
      string bp_name;

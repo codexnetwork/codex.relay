@@ -316,7 +316,7 @@
             }, 
             {
                "name":"reward_block_num",
-               "type":"int32"
+               "type":"uint32"
             }
          ]
       },
