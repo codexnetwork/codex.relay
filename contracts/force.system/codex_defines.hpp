@@ -5,6 +5,7 @@
 
 namespace codex {
 
+   // FIXME: Delete all DEFINEs to const var
    #define CORE_SYMBOL_PRECISION 10000
    
    static constexpr int NUM_OF_TOP_BPS = CONTRACT_NUM_OF_TOP_BPS;//23;
@@ -51,6 +52,7 @@ namespace codex {
    #define  REWARD_RECORD_SIZE   2000
    #define  BP_REWARD_RECORD_SIZE  360
 
+   // FIXME: Use a Static Name for genesis bps, donot need to make a genesis bp table
    struct creation_producer {
       account_name bp_name;
       int64_t      total_staked    = 0;
@@ -87,10 +89,18 @@ namespace codex {
    };
    
    // FIXME: By FanYang Need refactor the code
-   enum  class active_type:int32_t {
-      Normal=0,
-      Punish,
-      LackMortgage,
-      Removed
+   
+   // bp active_type
+   // normal -- error when producer block, after bps muit-sign --> punish -- after two days --> wait_no_punish --> bp do action --> normal
+   //  |
+   //  -- check no mortgage in onblock --> lack_mortgage -- wait bp mortgage --> wait_normal_from_lack_mortgage -- after a hour --> normal
+   // |
+   // -- bps muit-sign --> removed
+   // FIXME: Need refactor the code manager state in bp class
+   enum active_type : int32_t { 
+      Normal       = 0,   // normal
+      Punish       = 1,   // punish : bp no reward and cannot producer block in 2 days
+      LackMortgage = 2,   // lack_mortgage : no mortgage for a bp, after a hour will to normal
+      Removed      = 3    // removed : bp has been removed, can acitve
    };
 }

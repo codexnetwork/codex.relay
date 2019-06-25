@@ -248,7 +248,7 @@ namespace eosiosystem {
       };
       struct reward_currency {
          uint64_t     id;
-         eosio::name         chain;
+         eosio::name  chain;
          asset        supply;
          bool         reward_now = true;
 
@@ -290,7 +290,7 @@ namespace eosiosystem {
 
       //defind in delegate_bandwidth.cpp
       void changebw( account_name from, account_name receiver,
-                      asset stake_net_quantity, asset stake_cpu_quantity, bool transfer );
+                     const asset& stake_net_quantity, const asset& stake_cpu_quantity, bool transfer );
 
       void reset_block_weight(account_name block_producers[]);
       int128_t get_coin_power();
@@ -301,9 +301,6 @@ namespace eosiosystem {
 
       void settlebpvote();
       void settlevoter(const account_name voter, const account_name bpname);
-   
-   public:
-      inline asset get_freezed( account_name voter )const;
 
    public:
       // @abi action
@@ -398,13 +395,4 @@ namespace eosiosystem {
       // @abi action
       void rewardmine(int64_t reward_num);
    };
-   
-   asset system_contract::get_freezed( account_name voter )const
-   {
-      freeze_table freeze_tbl(_self, _self);
-      auto fts = freeze_tbl.find(voter);
-      eosio_assert(fts != freeze_tbl.end(), "voter has not freezed tokens");
-      
-      return fts->staked;
-   }
 };

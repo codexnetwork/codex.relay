@@ -18,7 +18,7 @@ namespace eosiosystem {
       set_blockchain_parameters( params );
    }
 
-    void system_contract::newaccount(account_name creator,account_name name,authority owner,authority active) {
+    void system_contract::newaccount(account_name, account_name name, authority, authority) {
 #if CONTRACT_RESOURCE_MODEL == RESOURCE_MODEL_DELEGATE
 
        user_resources_table  userres( _self, name);

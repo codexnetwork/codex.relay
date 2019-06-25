@@ -133,8 +133,8 @@ public:
       int32_t         active_type = 0;
 
       int64_t      block_age = 0;
-      uint32_t      last_block_amount = 0;
-      int64_t      block_weight = 0;   //换届如何清零?
+      uint32_t     last_block_amount = 0;
+      int64_t      block_weight = 0;
       asset        mortgage = asset(0);
 
       uint32_t    total_drain_block = 0;
