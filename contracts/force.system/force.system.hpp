@@ -86,52 +86,48 @@ namespace eosiosystem {
          EOSLIB_SERIALIZE(vote4ram_info, (voter)(staked))
       };
 
-      struct vote_reward_info {
-         int64_t total_voteage;
-         asset total_reward = asset(0);
-         int32_t  reward_block_num;
-         uint64_t primary_key() const { return reward_block_num; }
-      };
-
       struct bp_info {
          account_name name;
          public_key   block_signing_key;
          uint32_t     commission_rate = 0; // 0 - CORE_SYMBOL_PRECISION for 0% - 100%
          int64_t      total_staked    = 0;
-     //    asset        rewards_pool    = asset(0);
          asset        rewards_block   = asset(0);
          int64_t      total_voteage   = 0; // asset.amount * block height
          uint32_t     voteage_update_height = current_block_num();
          std::string  url;
-         bool emergency = false;
-         int32_t active_type = 0;
+         bool         emergency = false;
 
-         int64_t      block_age = 0;
-         uint32_t     last_block_amount = 0;
-         int64_t      block_weight = BLOCK_OUT_WEIGHT;   
-         asset        mortgage = asset(0);
+         int32_t  active_type       = 0;
+         int64_t  block_age         = 0;
+         uint32_t last_block_amount = 0;
+         int64_t  block_weight      = BLOCK_OUT_WEIGHT;
+         asset    mortgage          = asset(0);
 
-         int32_t     total_drain_block = 0;
-         asset       remain_punish = asset(0);
-         int32_t     active_change_block_num = 0;
-         int32_t     reward_size = 0;
-       //  vector<vote_reward_info> reward_vote    ;
+         int32_t total_drain_block       = 0;
+         asset   remain_punish           = asset(0);
+         int32_t active_change_block_num = 0;
+         int32_t reward_size             = 0;
 
          uint64_t primary_key() const { return name; }
 
-         void update( public_key key, uint32_t rate, std::string u ) {
+         inline void update( const public_key& key, uint32_t rate, const std::string& u ) {
             block_signing_key = key;
             commission_rate = rate;
             url = u;
          }
-         void     deactivate()       {active_type = static_cast<int32_t>(active_type::Removed);}
-         bool     isactive() const {
-            if (active_type == static_cast<int32_t>(active_type::Removed)) return false;
-            return true;
+
+         inline void deactivate() {
+            active_type = static_cast<int32_t>(active_type::Removed);
          }
+
+         inline bool isactive() const {
+            return active_type != static_cast<int32_t>(active_type::Removed);
+         }
+
          EOSLIB_SERIALIZE(bp_info, ( name )(block_signing_key)(commission_rate)(total_staked)
                (rewards_block)(total_voteage)(voteage_update_height)(url)(emergency)(active_type)
-               (block_age)(last_block_amount)(block_weight)(mortgage)(total_drain_block)(remain_punish)(active_change_block_num)(reward_size))
+               (block_age)(last_block_amount)(block_weight)(mortgage)
+               (total_drain_block)(remain_punish)(active_change_block_num)(reward_size))
       };
 
       struct producer {
@@ -149,62 +145,83 @@ namespace eosiosystem {
          EOSLIB_SERIALIZE(schedule_info, ( version )(block_height)(producers))
       };
 
+      struct vote_reward_info {
+         int64_t total_voteage    = 0;
+         asset   total_reward     = asset{0};
+
+         // FIXME: By FanYang need to uint32_t
+         int32_t reward_block_num = 0;
+
+         uint64_t primary_key() const { return reward_block_num; }
+      };
+
       struct reward_info {
-         uint64_t     id;
-         asset reward_block_out = asset(0);
-         asset reward_budget = asset(0);
-         int64_t total_block_out_age = 0;
-         int64_t cycle_reward = 0;
-         int32_t   gradient = 0;
-         int32_t   total_reward_time = 0;
-         int32_t   last_reward_block_num = 0;
-         account_name  last_producer_name;
+         uint64_t     id                    = 0;
+         asset        reward_block_out      = asset{0};
+         asset        reward_budget         = asset{0};
+         int64_t      total_block_out_age   = 0;
+         int64_t      cycle_reward          = 0;
+         int32_t      gradient              = 0;
+         int32_t      total_reward_time     = 0;
+         int32_t      last_reward_block_num = 0;
+         account_name last_producer_name    = 0;
          vector<int32_t> reward_block_num;
 
          uint64_t primary_key() const { return id; }
-         EOSLIB_SERIALIZE(reward_info, ( id )(reward_block_out)(reward_budget)(total_block_out_age)(cycle_reward)(gradient)
-         (total_reward_time)(last_reward_block_num)(last_producer_name)(reward_block_num))
+
+         EOSLIB_SERIALIZE( reward_info, 
+                           ( id )(reward_block_out)(reward_budget)
+                           (total_block_out_age)(cycle_reward)(gradient)
+                           (total_reward_time)(last_reward_block_num)
+                           (last_producer_name)(reward_block_num) )
       };
 
       struct creation_bp {
-         account_name bpname;
-         int64_t      total_staked    = 0;
-         int64_t      mortgage = 0;
+         account_name bpname       = 0;
+         int64_t      total_staked = 0;
+         int64_t      mortgage     = 0;
+
          uint64_t primary_key() const { return bpname; }
 
-         EOSLIB_SERIALIZE(creation_bp, (bpname)(total_staked)(mortgage))
+         EOSLIB_SERIALIZE( creation_bp, (bpname)(total_staked)(mortgage) )
       };
 
       struct punish_bp_info {
-         account_name initiator;
-         account_name bpname;
-         int32_t  drain_num = 0;
-         int32_t  update_block_num = 0;
+         account_name initiator        = 0;
+         account_name bpname           = 0;
+         int32_t      drain_num        = 0;
+         int32_t      update_block_num = 0;
+
          uint64_t primary_key() const { return bpname; }
 
-         EOSLIB_SERIALIZE(punish_bp_info, (initiator)(bpname)(drain_num)(update_block_num))
+         EOSLIB_SERIALIZE( punish_bp_info, 
+            (initiator)(bpname)(drain_num)(update_block_num) )
       };
 
       struct last_drain_block {
-         account_name bpname;
-         int32_t  drain_num = 0;
-         int32_t  update_block_num = 0;
+         account_name bpname           = 0;
+         int32_t      drain_num        = 0;
+         int32_t      update_block_num = 0;
+
          uint64_t primary_key() const { return bpname; }
 
-         EOSLIB_SERIALIZE(last_drain_block, (bpname)(drain_num)(update_block_num))
+         EOSLIB_SERIALIZE( last_drain_block, (bpname)(drain_num)(update_block_num) )
       };
 
       struct approve_punish_bp {
-         account_name bpname;
+         account_name         bpname = 0;
          vector<account_name> approve_producer;
+
          uint64_t primary_key() const { return bpname; }
-         EOSLIB_SERIALIZE(approve_punish_bp, (bpname)(approve_producer))
+
+         EOSLIB_SERIALIZE( approve_punish_bp, (bpname)(approve_producer) )
       };
 
       /** from relay.token begin*/
       inline static uint128_t get_account_idx(const eosio::name& chain, const asset& a) {
          return (uint128_t(uint64_t(chain)) << 64) + uint128_t(a.symbol.name());
       }
+
       struct reward_mine_info {
          int128_t total_mineage = 0;
          asset    reward_pool = asset(0);
@@ -381,8 +398,6 @@ namespace eosiosystem {
       void bailpunish(const account_name bpname);
       // @abi action
       void rewardmine(int64_t reward_num);
-
-
    };
    
    asset system_contract::get_freezed( account_name voter )const

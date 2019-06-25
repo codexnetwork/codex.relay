@@ -86,6 +86,7 @@ namespace codex {
       {N(biosbpz),100000,200000*CORE_SYMBOL_PRECISION}
    };
    
+   // FIXME: By FanYang Need refactor the code
    enum  class active_type:int32_t {
       Normal=0,
       Punish,
