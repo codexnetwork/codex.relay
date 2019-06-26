@@ -199,28 +199,11 @@ namespace eosiosystem {
       }
    }
 
-   void system_contract::init_creation_bp() {
-      creation_producer creation_bp_tbl(_self,_self);
-      for (int i=0;i!=26;++i) {
-         creation_bp_tbl.emplace(_self, [&]( creation_bp& b ) {
-            b.bpname = CREATION_BP[i].bp_name;
-            b.total_staked = CREATION_BP[i].total_staked;
-            b.mortgage = CREATION_BP[i].mortgage;
-         });
-      }
-   }
-
    void system_contract::update_elected_bps( const uint32_t curr_block_num ) {
       bps_table bps_tbl(_self, _self);
       
       std::vector<eosio::producer_key> vote_schedule;
       std::vector<int64_t> sorts(NUM_OF_TOP_BPS, 0);
-
-      creation_producer creation_bp_tbl(_self,_self);
-      auto create_bp = creation_bp_tbl.find(CREATION_BP[0].bp_name);
-      if (create_bp == creation_bp_tbl.end()) {
-         init_creation_bp();
-      }
 
       reward_table reward_inf(_self,_self);
       auto reward = reward_inf.find(REWARD_ID);
@@ -235,13 +218,16 @@ namespace eosiosystem {
          for( int i = 0; i < NUM_OF_TOP_BPS; ++i ) {
             auto total_shaked = it->total_staked;
             auto bp_mortgage = it->mortgage;
-            if (it->isactive() && bp_mortgage <= asset(0)) {
-               create_bp = creation_bp_tbl.find(it->name);
-               if (create_bp != creation_bp_tbl.end()) {
-                  total_shaked = create_bp->total_staked;
-                  bp_mortgage = asset(create_bp->mortgage);
+
+            // genesis bp use const values
+            if (it->isactive() && bp_mortgage <= asset(0)) { // genesis bp will no bp_mortgage
+               const auto genesis_data = get_genesis_bp_data( it->name );
+               if ( genesis_data.bp_name != 0 ) {
+                  total_shaked = genesis_data.total_staked;
+                  bp_mortgage = asset{ genesis_data.mortgage };
                }
             }
+
             if (it->active_type == static_cast<int32_t>(active_type::LackMortgage) && it->active_change_block_num < (curr_block_num - LACKMORTGAGE_FREEZE)) {
                bps_tbl.modify(it, _self, [&]( bp_info& b ) {
                   b.active_type = static_cast<int32_t>(active_type::Normal);
@@ -313,12 +299,10 @@ namespace eosiosystem {
          eosio_assert(bp != bps_tbl.end(),"cannot find bpinfo");
 
          auto bp_mortgage = bp->mortgage;
-         if (bp_mortgage <= asset(0)) {
-            for (int i = 0;i!=26;++i) {
-               if (CREATION_BP[i].bp_name == bp->name) {
-                  bp_mortgage = asset(CREATION_BP[i].mortgage);
-                  break;
-               }
+         if ( bp_mortgage <= asset{0} ) {
+            const auto genesis_data = get_genesis_bp_data( bp->name );
+            if( genesis_data.bp_name != 0 ){
+               bp_mortgage = asset{ genesis_data.mortgage };
             }
          }
          
