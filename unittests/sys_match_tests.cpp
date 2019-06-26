@@ -22,7 +22,7 @@ using namespace eosio::testing;
 struct sys_match : public TESTER {
    
 public:
-   sys_match() : sys_match_acc("sys.match"), exc_acc("biosbpa"), buyer("buyer"), 
+   sys_match() : sys_match_acc("sys.match"), exc_acc("codex.bpa"), buyer("buyer"), 
       seller("seller"), escrow("sys.match"), rel_token_acc("relay.token"),
       pair1_base(4, "BTC"), pair1_quote(2, "USDT"), pair2_base(4, "BTCC"), pair2_quote(2, "USDTC") {
       produce_blocks(2);
@@ -34,7 +34,7 @@ public:
          ("stake", "10000.0000 SYS"));
       push_action(config::system_account_name, name("vote4ram"), rel_token_acc, fc::mutable_variant_object()
          ("voter", rel_token_acc)
-         ("bpname", "biosbpa")
+         ("bpname", "codex.bpa")
          ("stake", "10000.0000 SYS"));
       set_code(rel_token_acc, relay_token_wast);
       set_abi(rel_token_acc, relay_token_abi);
@@ -46,7 +46,7 @@ public:
          ("stake", "10000.0000 SYS"));
       push_action(config::system_account_name, name("vote4ram"), sys_match_acc, fc::mutable_variant_object()
          ("voter", sys_match_acc)
-         ("bpname", "biosbpa")
+         ("bpname", "codex.bpa")
          ("stake", "10000.0000 SYS"));
       set_code(sys_match_acc, sys_match_wast);
       set_abi(sys_match_acc, sys_match_abi);
@@ -61,7 +61,7 @@ public:
       set_fee(rel_token_acc, N(issue), asset(100), 100000, 1000000, 1000);
       set_fee(rel_token_acc, N(transfer), asset(100), 100000, 1000000, 1000);
       
-      // third, issue BTC¡¢ USDT tokens
+      // third, issue BTCï¿½ï¿½ USDT tokens
       create_account(seller);// sell
       create_account(buyer);// buy
       push_action(rel_token_acc, name("create"), N(eosforce), fc::mutable_variant_object()
@@ -110,8 +110,8 @@ public:
       );
       
 
-//      efc push action sys.match create '["4,BTC", "btc1", "4,CBTC", "2,USDT", "usdt1", "2,CUSDT", "0", "biosbpa"]' -p biosbpa
-//efc push action sys.match create '["4,BTCC", "btc1", "4,CBTC", "2,USDT", "usdt1", "2,CUSDT", "0", "biosbpa"]' -p biosbpa
+//      efc push action sys.match create '["4,BTC", "btc1", "4,CBTC", "2,USDT", "usdt1", "2,CUSDT", "0", "codex.bpa"]' -p codex.bpa
+//efc push action sys.match create '["4,BTCC", "btc1", "4,CBTC", "2,USDT", "usdt1", "2,CUSDT", "0", "codex.bpa"]' -p codex.bpa
 
       // fifth, create trading pair
       push_action(sys_match_acc, name("create"), exc_acc, fc::mutable_variant_object()
@@ -227,7 +227,7 @@ BOOST_AUTO_TEST_CASE( test1 ) { try {
    BOOST_REQUIRE_EQUAL(seller_before + asset::from_string( "3950.0000 CUSDT" ), seller_now);
    BOOST_REQUIRE_EQUAL(buyer_before + quantity, buyer_now);
 
-   // ÍêÈ«³É½»Âòµ¥(¼Û¸ñµÈÓÚÂòÒ»¼Û, ÊýÁ¿µÈÓÚ¹Òµ¥ÊýÁ¿)
+   // ï¿½ï¿½È«ï¿½É½ï¿½ï¿½ï¿½(ï¿½Û¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¹Òµï¿½ï¿½ï¿½ï¿½ï¿½)
    // fully match bid orders (price equals buy first price, bid quantity equals order quantity)
    //efc push action relay.token trade '["testa", "sys.match", "btc1", "9.0000 CBTC", "1", "testa;testa;0;3950.00 CUSDT;0"]' -p testa
    quantity = asset::from_string( "9.0000 CBTC" );
@@ -246,7 +246,7 @@ BOOST_AUTO_TEST_CASE( test1 ) { try {
    BOOST_REQUIRE_EQUAL(seller_before + asset::from_string( "35550.0000 CUSDT" ), seller_now);
    BOOST_REQUIRE_EQUAL(buyer_before + quantity, buyer_now);
 
-   //²¿·Ö³É½»Âôµ¥(¼Û¸ñµÈÓÚÂòÒ»¼Û)
+   //ï¿½ï¿½ï¿½Ö³É½ï¿½ï¿½ï¿½ï¿½ï¿½(ï¿½Û¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½)
    // partially match ask order (price equals sell first price)
    //efc push action relay.token trade '["testb", "sys.match", "usdt1", "4000.0000 CUSDT", "1", "testb;testb;0;4000.0000 CUSDT;1"]' -p testb
    quantity = asset::from_string( "4000.0000 CUSDT" );
@@ -265,7 +265,7 @@ BOOST_AUTO_TEST_CASE( test1 ) { try {
    BOOST_REQUIRE_EQUAL(buyer_before + asset::from_string( "1.0000 CBTC" ), buyer_now);
    BOOST_REQUIRE_EQUAL(seller_before + quantity, seller_now);
 
-   // ÍêÈ«³É½»Âôµ¥(¼Û¸ñµÈÓÚÂòÒ»¼Û, ÊýÁ¿µÈÓÚ¹Òµ¥ÊýÁ¿)
+   // ï¿½ï¿½È«ï¿½É½ï¿½ï¿½ï¿½ï¿½ï¿½(ï¿½Û¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¹Òµï¿½ï¿½ï¿½ï¿½ï¿½)
    // efc push action relay.token trade '["testb", "sys.match", "usdt1", "12000.0000 CUSDT", "1", "testb;testb;0;4000.0000 CUSDT;1"]' -p testb
    quantity = asset::from_string( "12000.0000 CUSDT" );
    buyer_before = get_relay_token_currency_balance(rel_token_acc, token1_chain, pair1_base_sym, buyer);
@@ -287,7 +287,7 @@ BOOST_AUTO_TEST_CASE( test1 ) { try {
 
 } FC_LOG_AND_RETHROW() }
 
-//²âÊÔÓÃÀý¶þ£º²âÊÔ¼Û¸ñ´óÓÚ¹Òµ¥Çé¿öÏÂ£¬²¿·ÖÆ¥Åä£¬ÍêÈ«Æ¥Åä
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¼Û¸ï¿½ï¿½ï¿½Ú¹Òµï¿½ï¿½ï¿½ï¿½ï¿½Â£ï¿½ï¿½ï¿½ï¿½ï¿½Æ¥ï¿½ä£¬ï¿½ï¿½È«Æ¥ï¿½ï¿½
 BOOST_AUTO_TEST_CASE( test2 ) { try {
 
    produce_blocks(2);
@@ -356,7 +356,7 @@ BOOST_AUTO_TEST_CASE( test2 ) { try {
    BOOST_REQUIRE_EQUAL(seller_before + asset::from_string( "3900.0000 CUSDT" ), seller_now);
    BOOST_REQUIRE_EQUAL(buyer_before + quantity, buyer_now);
 
-   // ÍêÈ«³É½»Âòµ¥(¼Û¸ñµÈÓÚÂòÒ»¼Û, ÊýÁ¿µÈÓÚ¹Òµ¥ÊýÁ¿)
+   // ï¿½ï¿½È«ï¿½É½ï¿½ï¿½ï¿½(ï¿½Û¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¹Òµï¿½ï¿½ï¿½ï¿½ï¿½)
    // fully match bid orders (price equals buy first price, bid quantity equals order quantity)
    //efc push action relay.token trade '["testa", "sys.match", "btc1", "9.0000 CBTC", "1", "testa;testa;0;3950.00 CUSDT;0"]' -p testa
    quantity = asset::from_string( "9.0000 CBTC" );
@@ -375,7 +375,7 @@ BOOST_AUTO_TEST_CASE( test2 ) { try {
    BOOST_REQUIRE_EQUAL(seller_before + asset::from_string( "35550.0000 CUSDT" ), seller_now);
    BOOST_REQUIRE_EQUAL(buyer_before + quantity, buyer_now);
 
-   //²¿·Ö³É½»Âôµ¥(¼Û¸ñµÈÓÚÂòÒ»¼Û)
+   //ï¿½ï¿½ï¿½Ö³É½ï¿½ï¿½ï¿½ï¿½ï¿½(ï¿½Û¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½)
    // partially match ask order (price equals sell first price)
    //efc push action relay.token trade '["testb", "sys.match", "usdt1", "4100.0000 CUSDT", "1", "testb;testb;0;4100.0000 CUSDT;1"]' -p testb
    quantity = asset::from_string( "4100.0000 CUSDT" );
@@ -394,7 +394,7 @@ BOOST_AUTO_TEST_CASE( test2 ) { try {
    BOOST_REQUIRE_EQUAL(seller_before + asset::from_string( "4000.0000 CUSDT" ), seller_now);
    BOOST_REQUIRE_EQUAL(buyer_before + asset::from_string( "1.0000 CBTC" ), buyer_now);
 
-   // ÍêÈ«³É½»Âôµ¥(¼Û¸ñµÈÓÚÂòÒ»¼Û, ÊýÁ¿µÈÓÚ¹Òµ¥ÊýÁ¿)
+   // ï¿½ï¿½È«ï¿½É½ï¿½ï¿½ï¿½ï¿½ï¿½(ï¿½Û¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¹Òµï¿½ï¿½ï¿½ï¿½ï¿½)
    // efc push action relay.token trade '["testb", "sys.match", "usdt1", "12000.0000 CUSDT", "1", "testb;testb;0;4000.0000 CUSDT;1"]' -p testb
    /*quantity = asset::from_string( "12000.0000 CUSDT" );
    buyer_before = get_relay_token_currency_balance(rel_token_acc, token1_chain, pair1_base_sym, buyer);

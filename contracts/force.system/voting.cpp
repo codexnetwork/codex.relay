@@ -42,9 +42,7 @@ namespace eosiosystem {
    void system_contract::vote( const account_name voter, const account_name bpname, const asset stake ) {
       require_auth(voter);
 
-      creation_producer creation_bp_tbl(_self,_self);
-      auto create_bp = creation_bp_tbl.find(bpname);
-      eosio_assert(create_bp == creation_bp_tbl.end(),"creation bp can not to be voted");
+      eosio_assert(!is_genesis_bp( bpname ), "creation bp can not to be voted");
 
       eosio_assert(stake.symbol == CORE_SYMBOL, "only support CORE SYMBOL token");
       eosio_assert(0 <= stake.amount && stake.amount % CORE_SYMBOL_PRECISION == 0,

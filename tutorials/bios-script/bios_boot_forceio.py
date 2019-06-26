@@ -87,7 +87,6 @@ def stepCreateNodeDirs():
     sleep(0.5)
 
 def stepLog():
-    run('tail -n 1000 ' + datas.nodes_dir + '/biosbpa.log')
     cleos('get info')
 
 def stepMkConfig():
@@ -136,7 +135,7 @@ def stepMakeGenesis():
 
 def createMap(chain, token_account):
     pushAction(relay_account_name, "newchannel", "eosforce", 
-        '{"chain":"%s","checker":"biosbpa","id":"","mroot":""}' % (chain))
+        '{"chain":"%s","checker":"codex.bpa","id":"","mroot":""}' % (chain))
     pushAction(relay_account_name, "newmap", "eosforce", 
         '{"chain":"%s","type":"token","id":"","act_account":"%s","act_name":"transfer","account":"relay.token","data":""}' % (chain, token_account))
 

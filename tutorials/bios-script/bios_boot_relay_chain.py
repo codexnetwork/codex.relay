@@ -86,7 +86,6 @@ def stepCreateNodeDirs():
     sleep(0.5)
 
 def stepLog():
-    run('tail -n 1000 ' + datas.nodes_dir + '/biosbpa.log')
     cleos('get info')
     print('you can use \"alias cleost=\'%s\'\" to call cleos to testnet' % datas.args.cleos)
 
@@ -141,7 +140,7 @@ def createMap(chain, pubKeys):
           '\'{"threshold": 1,"keys": [{"key": "%s","weight": 1}],"accounts": [{"permission":{"actor":"%s","permission":"%s"},"weight":1}]}\'') % 
           (chain, pubKeys['eosforce'], relay_token_name, code_account_name))
     pushAction(relay_account_name, "newchannel", chain, 
-        '{"chain":"%s","checker":"biosbpa","id":"","mroot":""}' % (chain))
+        '{"chain":"%s","checker":"codex.bpa","id":"","mroot":""}' % (chain))
 
 def createMapTokenHandler(chain, typ_name, side_contract, token_account):
     pushAction( relay_account_name,

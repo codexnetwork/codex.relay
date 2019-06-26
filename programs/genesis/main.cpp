@@ -51,7 +51,7 @@ int main( int argc, const char **argv ) {
       eosio::chain::account_tuple tu;
       tu.key = pub_key;
       tu.asset = eosio::chain::asset(10000);
-      std::string name("biosbp");
+      std::string name("codex.bp");
       char mark = 'a' + i;
       name.append(1u, mark);
       tu.name = string_to_name(name.c_str());

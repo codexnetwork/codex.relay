@@ -261,14 +261,12 @@ namespace eosiosystem {
       typedef eosio::multi_index<N(bps),         bp_info>       bps_table;
       typedef eosio::multi_index<N(schedules),   schedule_info> schedules_table;
       typedef eosio::multi_index<N(reward),   reward_info> reward_table;
-      typedef eosio::multi_index<N(creationbp),   creation_bp> creation_producer;
       typedef eosio::multi_index<N(lastdrainbp),   last_drain_block> last_drain_bp;
       typedef eosio::multi_index<N(punishbps),   punish_bp_info> punish_bps;
       typedef eosio::multi_index<N(apppunishbps),   approve_punish_bp> approve_punish_bps;
       typedef eosio::multi_index<N(votereward),   vote_reward_info> bp_vote_reward;
 
       //reward_info reward;
-      void init_creation_bp();
       void update_elected_bps( const uint32_t curr_block_num );
 
       void reward_bps( const uint32_t curr_block_num, const int64_t reward_amount );

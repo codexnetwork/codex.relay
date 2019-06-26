@@ -52,41 +52,49 @@ namespace codex {
    #define  REWARD_RECORD_SIZE   2000
    #define  BP_REWARD_RECORD_SIZE  360
 
-   // FIXME: Use a Static Name for genesis bps, donot need to make a genesis bp table
-   struct creation_producer {
-      account_name bp_name;
-      int64_t      total_staked    = 0;
-      int64_t      mortgage = 0;
+   inline bool is_genesis_bp( const account_name bpname ) {
+      const auto genesis_bp_per = "codex.bp";
+      return eosio::name{static_cast<uint64_t>(bpname)}.to_string().find( genesis_bp_per ) != 0;
+   }
+
+   struct genesis_producer_data {
+      account_name bp_name      = 0;
+      int64_t      total_staked = 0;
+      int64_t      mortgage     = 0;
    };
 
-   static constexpr creation_producer CREATION_BP[26] = {
-      {N(biosbpa),400000,200000*CORE_SYMBOL_PRECISION},
-      {N(biosbpb),400000,200000*CORE_SYMBOL_PRECISION},
-      {N(biosbpc),400000,200000*CORE_SYMBOL_PRECISION},
-      {N(biosbpd),400000,200000*CORE_SYMBOL_PRECISION},
-      {N(biosbpe),600000,200000*CORE_SYMBOL_PRECISION},
-      {N(biosbpf),600000,200000*CORE_SYMBOL_PRECISION},
-      {N(biosbpg),600000,200000*CORE_SYMBOL_PRECISION},
-      {N(biosbph),600000,200000*CORE_SYMBOL_PRECISION},
-      {N(biosbpi),1300000,200000*CORE_SYMBOL_PRECISION},
-      {N(biosbpj),1300000,200000*CORE_SYMBOL_PRECISION},
-      {N(biosbpk),1300000,200000*CORE_SYMBOL_PRECISION},
-      {N(biosbpl),2100000,200000*CORE_SYMBOL_PRECISION},
-      {N(biosbpm),2100000,200000*CORE_SYMBOL_PRECISION},
-      {N(biosbpn),10000000,200000*CORE_SYMBOL_PRECISION},
-      {N(biosbpo),10000000,200000*CORE_SYMBOL_PRECISION},
-      {N(biosbpp),10000000,200000*CORE_SYMBOL_PRECISION},
-      {N(biosbpq),10000000,200000*CORE_SYMBOL_PRECISION},
-      {N(biosbpr),10000000,200000*CORE_SYMBOL_PRECISION},
-      {N(biosbps),10000000,200000*CORE_SYMBOL_PRECISION},
-      {N(biosbpt),10000000,200000*CORE_SYMBOL_PRECISION},
-      {N(biosbpu),10000000,200000*CORE_SYMBOL_PRECISION},
-      {N(biosbpv),100000,200000*CORE_SYMBOL_PRECISION},
-      {N(biosbpw),100000,200000*CORE_SYMBOL_PRECISION},
-      {N(biosbpx),100000,200000*CORE_SYMBOL_PRECISION},
-      {N(biosbpy),100000,200000*CORE_SYMBOL_PRECISION},
-      {N(biosbpz),100000,200000*CORE_SYMBOL_PRECISION}
-   };
+   constexpr inline genesis_producer_data get_genesis_bp_data( const account_name bpname ) {
+      switch( bpname ){
+         case N(codex.bpa) : return { bpname, 400000,   200000 * CORE_SYMBOL_PRECISION };
+         case N(codex.bpb) : return { bpname, 400000,   200000 * CORE_SYMBOL_PRECISION };
+         case N(codex.bpc) : return { bpname, 400000,   200000 * CORE_SYMBOL_PRECISION };
+         case N(codex.bpd) : return { bpname, 400000,   200000 * CORE_SYMBOL_PRECISION };
+         case N(codex.bpe) : return { bpname, 600000,   200000 * CORE_SYMBOL_PRECISION };
+         case N(codex.bpf) : return { bpname, 600000,   200000 * CORE_SYMBOL_PRECISION };
+         case N(codex.bpg) : return { bpname, 600000,   200000 * CORE_SYMBOL_PRECISION };
+         case N(codex.bph) : return { bpname, 600000,   200000 * CORE_SYMBOL_PRECISION };
+         case N(codex.bpi) : return { bpname, 1300000,  200000 * CORE_SYMBOL_PRECISION };
+         case N(codex.bpj) : return { bpname, 1300000,  200000 * CORE_SYMBOL_PRECISION };
+         case N(codex.bpk) : return { bpname, 1300000,  200000 * CORE_SYMBOL_PRECISION };
+         case N(codex.bpl) : return { bpname, 2100000,  200000 * CORE_SYMBOL_PRECISION };
+         case N(codex.bpm) : return { bpname, 2100000,  200000 * CORE_SYMBOL_PRECISION };
+         case N(codex.bpn) : return { bpname, 10000000, 200000 * CORE_SYMBOL_PRECISION };
+         case N(codex.bpo) : return { bpname, 10000000, 200000 * CORE_SYMBOL_PRECISION };
+         case N(codex.bpp) : return { bpname, 10000000, 200000 * CORE_SYMBOL_PRECISION };
+         case N(codex.bpq) : return { bpname, 10000000, 200000 * CORE_SYMBOL_PRECISION };
+         case N(codex.bpr) : return { bpname, 10000000, 200000 * CORE_SYMBOL_PRECISION };
+         case N(codex.bps) : return { bpname, 10000000, 200000 * CORE_SYMBOL_PRECISION };
+         case N(codex.bpt) : return { bpname, 10000000, 200000 * CORE_SYMBOL_PRECISION };
+         case N(codex.bpu) : return { bpname, 10000000, 200000 * CORE_SYMBOL_PRECISION };
+         case N(codex.bpv) : return { bpname, 100000,   200000 * CORE_SYMBOL_PRECISION };
+         case N(codex.bpw) : return { bpname, 100000,   200000 * CORE_SYMBOL_PRECISION };
+         case N(codex.bpx) : return { bpname, 100000,   200000 * CORE_SYMBOL_PRECISION };
+         case N(codex.bpy) : return { bpname, 100000,   200000 * CORE_SYMBOL_PRECISION };
+         case N(codex.bpz) : return { bpname, 100000,   200000 * CORE_SYMBOL_PRECISION };
+         default :
+            return {};
+      }
+   }
    
    // FIXME: By FanYang Need refactor the code
    

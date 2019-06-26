@@ -416,7 +416,7 @@ namespace eosio { namespace testing {
     }
   ],
   "initial_producer_list": [{
-      "name": "biosbpa",
+      "name": "codex.bpa",
       "bpkey": "FOSC7LmC1HJWkHNd1uJ5cBa24vZyEi1HdB4U7DncPkfqNVNfVMCR64",
       "commission_rate": 10,
       "url": ""
@@ -429,7 +429,7 @@ namespace eosio { namespace testing {
 	  	 vcfg.genesis.initial_account_list[0].key = get_public_key( N(eosforce), "active" );
 	  	 vcfg.genesis.initial_account_list[2].key = get_public_key( N(force.test), "active" );
 	  	 vcfg.genesis.initial_account_list[3].key = get_public_key( N(force.config), "active" );
-	  	 vcfg.genesis.initial_producer_list[0].bpkey = get_public_key( N(biosbpa), "active" );
+	  	 vcfg.genesis.initial_producer_list[0].bpkey = get_public_key( N(codex.bpa), "active" );
 
          //vcfg.genesis.initial_timestamp = fc::time_point::from_iso_string("2020-01-01T00:00:00.000");
          vcfg.genesis.initial_key = get_public_key( config::system_account_name, "active" );
