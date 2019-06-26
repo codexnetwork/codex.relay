@@ -182,9 +182,9 @@ private:
    typedef multi_index<N(minereward), reward_mine_info> reward_mine ;
    
 
-   void sub_balance( account_name owner, name chain, asset value );
-   void add_balance( account_name owner, name chain, asset value, account_name ram_payer );
-   void settle_user(account_name owner, name chain, asset value);
+   void sub_balance( uint32_t curr_block_num, account_name owner, name chain, asset value );
+   void add_balance( uint32_t curr_block_num, account_name owner, name chain, asset value, account_name ram_payer );
+   void settle_user( uint32_t curr_block_num, account_name owner, name chain, const asset& value );
 
 public:
    struct transfer_args {
