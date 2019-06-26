@@ -516,7 +516,7 @@ namespace exchange {
          return;
       }
       
-      uint32_t curr_block = current_block_num();
+      const auto curr_block = current_block_num();
       lower_key = ((uint64_t)pair_id << 32) | curr_block;
       itr1 = idx_deals.lower_bound(lower_key);
       if (itr1 == idx_deals.cend()) itr1--;

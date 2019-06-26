@@ -442,14 +442,16 @@ namespace exchange {
       }
       auto deducted_fee_type = fee_type;
 
+      const auto curr_block_num = current_block_num();
+
       if (fee_type == 2 && itr_fee_taker->points_enabled) {
          asset points_as_fee;
          auto  points = get_balance(payer, itr_fee_taker->points.symbol);
          asset points_price;
          if (base_or_quote) {
-            points_price = get_avg_price( current_block_num(), itr1->base_chain, itr1->base_sym, eosio::name{.value=0}, itr_fee_taker->points.symbol );
+            points_price = get_avg_price( curr_block_num, itr1->base_chain, itr1->base_sym, eosio::name{.value=0}, itr_fee_taker->points.symbol );
          } else {
-            points_price = get_avg_price( current_block_num(), itr1->quote_chain, itr1->quote_sym, eosio::name{.value=0}, itr_fee_taker->points.symbol );
+            points_price = get_avg_price( curr_block_num, itr1->quote_chain, itr1->quote_sym, eosio::name{.value=0}, itr_fee_taker->points.symbol );
          }
          print("\n charge_fee: points=", points,", points_price=", points_price, ", fee=", fee,"\n");
          if (points.amount > 0 && points_price.amount > 0) {
@@ -1052,7 +1054,7 @@ namespace exchange {
       auto itr1 = idx_deals.lower_bound(lower_key);
       eosio_assert(!(itr1 != idx_deals.end() && itr1->pair_id == pair_id), "trading pair already marked");
       
-      auto start_block = (current_block_num() - 1) / INTERVAL_BLOCKS * INTERVAL_BLOCKS + 1;
+      const auto start_block = (current_block_num() - 1) / INTERVAL_BLOCKS * INTERVAL_BLOCKS + 1;
       auto pk = deals_table.available_primary_key();
       deals_table.emplace( _self, [&]( auto& d ) {
          d.id = (uint32_t)pk;
