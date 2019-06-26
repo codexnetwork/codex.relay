@@ -531,9 +531,7 @@ namespace eosiosystem {
    void system_contract::addmortgage(const account_name bpname,const account_name payer,asset quantity) {
       require_auth(payer);
 
-      creation_producer creation_bp_tbl(_self,_self);
-      auto create_bp = creation_bp_tbl.find(bpname);
-      eosio_assert(create_bp == creation_bp_tbl.end(),"creation bp cannot add mortgage");
+      eosio_assert(!is_genesis_bp( bpname ), "creation bp cannot add mortgage");
       
       bps_table bps_tbl(_self, _self);
       auto bp = bps_tbl.find(bpname);
@@ -760,9 +758,7 @@ namespace eosiosystem {
       auto drainbp = drain_bp_tbl.find(bpname); 
       eosio_assert(drainbp != drain_bp_tbl.end(),"the bp cannot be punished");
 
-      creation_producer creation_bp_tbl(_self,_self);
-      auto create_bp = creation_bp_tbl.find(bpname);
-      eosio_assert(create_bp == creation_bp_tbl.end(),"creation bp cannot be punished");
+      eosio_assert(!is_genesis_bp( bpname ), "creation bp cannot be punished");
 
       punish_bps punish_bp(_self,_self);
       auto bp_punish = punish_bp.find(bpname);
