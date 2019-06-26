@@ -89,32 +89,25 @@ namespace eosiosystem {
       struct bp_info {
          account_name name;
          public_key   block_signing_key;
-         uint32_t     commission_rate = 0; // 0 - CORE_SYMBOL_PRECISION for 0% - 100%
-         int64_t      total_staked    = 0;
-         asset        rewards_block   = asset(0);
-         int64_t      total_voteage   = 0; // asset.amount * block height
-         uint32_t     voteage_update_height = current_block_num();
+         uint32_t     commission_rate       = 0; // 0 - CORE_SYMBOL_PRECISION for 0% - 100%
+         int64_t      total_staked          = 0;
+         asset        rewards_block         = asset{0};
+         int64_t      total_voteage         = 0; // asset.amount * block height
+         uint32_t     voteage_update_height = 0;
          std::string  url;
-         bool         emergency = false;
+         bool         emergency             = false;
 
-         int32_t  active_type       = 0;
-         int64_t  block_age         = 0;
-         uint32_t last_block_amount = 0;
-         int64_t  block_weight      = BLOCK_OUT_WEIGHT;
-         asset    mortgage          = asset(0);
-
+         int32_t  active_type             = 0;
+         int64_t  block_age               = 0;
+         uint32_t last_block_amount       = 0;
+         int64_t  block_weight            = BLOCK_OUT_WEIGHT;
+         asset    mortgage                = asset{0};
          uint32_t total_drain_block       = 0;
-         asset   remain_punish            = asset(0);
+         asset    remain_punish           = asset{0};
          uint32_t active_change_block_num = 0;
-         int32_t reward_size              = 0;
+         int32_t  reward_size             = 0;
 
          uint64_t primary_key() const { return name; }
-
-         inline void update( const public_key& key, uint32_t rate, const std::string& u ) {
-            block_signing_key = key;
-            commission_rate = rate;
-            url = u;
-         }
 
          inline void deactivate() {
             active_type = static_cast<int32_t>(active_type::Removed);
@@ -276,11 +269,14 @@ namespace eosiosystem {
 
       //reward_info reward;
       void init_creation_bp();
-      void update_elected_bps();
+      void update_elected_bps( const uint32_t curr_block_num );
 
-      void reward_bps(const int64_t reward_amount);
-      void reward_block(const uint32_t schedule_version,const int64_t reward_amount,bool force_change);
-      void reward_mines(const int64_t reward_amount);
+      void reward_bps( const uint32_t curr_block_num, const int64_t reward_amount );
+      void reward_block( const uint32_t curr_block_num,
+                         const uint32_t schedule_version,
+                         const int64_t reward_amount,
+                         bool force_change );
+      void reward_mines( const uint32_t curr_block_num, const int64_t reward_amount );
 
       bool is_super_bp( account_name block_producers[], account_name name );
 
@@ -293,13 +289,13 @@ namespace eosiosystem {
                      const asset& stake_net_quantity, const asset& stake_cpu_quantity, bool transfer );
 
       void reset_block_weight(account_name block_producers[]);
-      int128_t get_coin_power();
-      int128_t get_vote_power();
+      int128_t get_coin_power( const uint32_t curr_block_num );
+      int128_t get_vote_power( const uint32_t curr_block_num );
 
       void init_reward_info();
       void update_reward_stable();
 
-      void settlebpvote();
+      void settlebpvote( const uint32_t curr_block_num );
       void settlevoter(const account_name voter, const account_name bpname);
 
    public:
