@@ -21,95 +21,95 @@
   "initial_account_list": [{
       "key": "#PUB#5RwCzy3EDiv66gP1Z7XCw1XNDgADxAVx2TCuYLQ5goLcPcRAuz",
       "asset": "1.0000 #CORE_SYMBOL#",
-      "name": "biosbpa"
+      "name": "codex.bpa"
     },{
       "key": "#PUB#5zwzBPmeQuoLaRudc58dDZ3cv1tmt5M8jVRFhZVB7A5qLcmjah",
       "asset": "1.0000 #CORE_SYMBOL#",
-      "name": "biosbpb"
+      "name": "codex.bpb"
     },{
       "key": "#PUB#4y9gHT4zzQhSZ8pNktK7yZT7mRaYXxartw66qRQgcxHM3bPybC",
       "asset": "1.0000 #CORE_SYMBOL#",
-      "name": "biosbpc"
+      "name": "codex.bpc"
     },{
       "key": "#PUB#7ScLJWawLfC2pZSNifW7pWDNiykZJG5C27zZb3iemggG3eLUXq",
       "asset": "1.0000 #CORE_SYMBOL#",
-      "name": "biosbpd"
+      "name": "codex.bpd"
     },{
       "key": "#PUB#5xJhEAxtW11Z1NSxuAcVtttw1pgwJWNTKa5VneAQFimy9cXsZv",
       "asset": "1.0000 #CORE_SYMBOL#",
-      "name": "biosbpe"
+      "name": "codex.bpe"
     },{
       "key": "#PUB#6PnviyQ19JpppYhgWneRitqm3b49mnRfxP8bNPMwS2JVoktrd4",
       "asset": "1.0000 #CORE_SYMBOL#",
-      "name": "biosbpf"
+      "name": "codex.bpf"
     },{
       "key": "#PUB#6akcLwTd85yWdXG2YmE4J5rWsKn2auwin2ebQmPsukpVvrrvts",
       "asset": "1.0000 #CORE_SYMBOL#",
-      "name": "biosbpg"
+      "name": "codex.bpg"
     },{
       "key": "#PUB#7yHH17yNN6x1RfnEtPea31rEFYZMvRjUfEs4xkomJ9kPCu5NgT",
       "asset": "1.0000 #CORE_SYMBOL#",
-      "name": "biosbph"
+      "name": "codex.bph"
     },{
       "key": "#PUB#6NaspmEtghzs1rkNWbv847cofqJjuAxKuLuij9BU5XsgUSpcvW",
       "asset": "1.0000 #CORE_SYMBOL#",
-      "name": "biosbpi"
+      "name": "codex.bpi"
     },{
       "key": "#PUB#7vuhc9kVNz9C5UK1azZozTqy4MuEx3yTG99vMKFVuDAhjLt3VT",
       "asset": "1.0000 #CORE_SYMBOL#",
-      "name": "biosbpj"
+      "name": "codex.bpj"
     },{
       "key": "#PUB#6gDgjMUSs4pGZ2YhHESN4gLLrBRqFRRReCKxUhrq1gzY3TV4N2",
       "asset": "1.0000 #CORE_SYMBOL#",
-      "name": "biosbpk"
+      "name": "codex.bpk"
     },{
       "key": "#PUB#6PXtheP5cf9FmPK98pGyHV7JxEFVXgxPGnt6PnGsq38S4d3ZU4",
       "asset": "1.0000 #CORE_SYMBOL#",
-      "name": "biosbpl"
+      "name": "codex.bpl"
     },{
       "key": "#PUB#5Qm7tmPKhZQDKcc7iZzJM9aEFoL1gFExcnrZ2hrCZDi5qUM6mh",
       "asset": "1.0000 #CORE_SYMBOL#",
-      "name": "biosbpm"
+      "name": "codex.bpm"
     },{
       "key": "#PUB#5G3V9N9HYdK8LnP1KChCJkJzYskP7UWu4dHjEicVXd7bYNoCe5",
       "asset": "1.0000 #CORE_SYMBOL#",
-      "name": "biosbpn"
+      "name": "codex.bpn"
     },{
       "key": "#PUB#7WJNx4spJrc3fvjFcKrvb7wWXRKimj5SKcGg3pTpRHz2r1nSLq",
       "asset": "1.0000 #CORE_SYMBOL#",
-      "name": "biosbpo"
+      "name": "codex.bpo"
     },{
       "key": "#PUB#5UgJ6YEoxzLPjueJyCsPpqdyFw3KjDRGdYtgVa9ALKCctaWNjw",
       "asset": "1.0000 #CORE_SYMBOL#",
-      "name": "biosbpp"
+      "name": "codex.bpp"
     },{
       "key": "#PUB#5M4wYiHLTPCZ9GhRJe9J3zvE44gArQvgozGkNyqcGKygCa25tb",
       "asset": "1.0000 #CORE_SYMBOL#",
-      "name": "biosbpq"
+      "name": "codex.bpq"
     },{
       "key": "#PUB#6e6GwbB7nKidqztFicku7tvFac1kLV4VkeHB2GfbUrv6DYHvH8",
       "asset": "1.0000 #CORE_SYMBOL#",
-      "name": "biosbpr"
+      "name": "codex.bpr"
     },{
       "key": "#PUB#7TFWbYDBomWwKozFKzmJkHDgAqSPFvayFah5UunVjGGjCAjrtu",
       "asset": "1.0000 #CORE_SYMBOL#",
-      "name": "biosbps"
+      "name": "codex.bps"
     },{
       "key": "#PUB#6DBeJau2vWw2iEiydnBzeeAweHWsk3J3TexR9MPMBxW9gdxcUu",
       "asset": "1.0000 #CORE_SYMBOL#",
-      "name": "biosbpt"
+      "name": "codex.bpt"
     },{
       "key": "#PUB#5PeWjKoKz2nrPDEcnNesfA4zaL1u9gWuAxGBCVJcmAm1DBs8wW",
       "asset": "1.0000 #CORE_SYMBOL#",
-      "name": "biosbpu"
+      "name": "codex.bpu"
     },{
       "key": "#PUB#8K5p6yXsPyDtHmwgNKWAMh3p3vcuJZPHZRhVCzchaqkhAW7WLU",
       "asset": "1.0000 #CORE_SYMBOL#",
-      "name": "biosbpv"
+      "name": "codex.bpv"
     },{
       "key": "#PUB#7Y7wg3xEoEmS5u5498Ri4DbSBrahoDkuquZePCaafXx9jWaaFq",
       "asset": "1.0000 #CORE_SYMBOL#",
-      "name": "biosbpw"
+      "name": "codex.bpw"
     },{
       "key": "#PUB#7o5Uz5Po6RohDByRS1sesQEEUGz7JWJxK3T3nvjeL5er9eDrWk",
       "asset": "100000000.0000 #CORE_SYMBOL#",
@@ -273,117 +273,117 @@
     }
   ],
   "initial_producer_list": [{
-      "name": "biosbpa",
+      "name": "codex.bpa",
       "bpkey": "#PUB#75TjxzEuFjFV1htmt1kEwJY5eYio16qCCJiMYS5naP19kJXCNE",
       "commission_rate": 0,
       "url": ""
     },{
-      "name": "biosbpb",
+      "name": "codex.bpb",
       "bpkey": "#PUB#6o3fD1cTd9hc2biHCdnjt6Ket6SFnsrnC3yMJYAW4pqHvNWkvh",
       "commission_rate": 10000,
       "url": ""
     },{
-      "name": "biosbpc",
+      "name": "codex.bpc",
       "bpkey": "#PUB#88UT4jH8uKBNos5sH7MAvWKGXUbVhaqoJDQJnBrCqA3zNuuKcT",
       "commission_rate": 5000,
       "url": ""
     },{
-      "name": "biosbpd",
+      "name": "codex.bpd",
       "bpkey": "#PUB#6Gi4gV1csc4puburKiuxaaBgeieZPi1DLdkdNXb4NQfwHvQ1y3",
       "commission_rate": 3333,
       "url": ""
     },{
-      "name": "biosbpe",
+      "name": "codex.bpe",
       "bpkey": "#PUB#52QFUYM7QLNN3JjWF3QXm6h73Zw5dno52eBDaFUfdoaAxHp5Ah",
       "commission_rate": 2500,
       "url": ""
     },{
-      "name": "biosbpf",
+      "name": "codex.bpf",
       "bpkey": "#PUB#7nbBXvu4pqav6DtNKsCxGicxMzxj2XbYwEr1Q33KN6FuVrYCLr",
       "commission_rate": 2000,
       "url": ""
     },{
-      "name": "biosbpg",
+      "name": "codex.bpg",
       "bpkey": "#PUB#5H1rD3w39sQMu982oAYo4gjw6BY2AEq2EVCXPMBm9Sc7af4oCA",
       "commission_rate": 1666,
       "url": ""
     },{
-      "name": "biosbph",
+      "name": "codex.bph",
       "bpkey": "#PUB#52CdPMvWVqtxNP4fqrrgbFmygn6M5jSaQmqFsojbJj3mH4JMKT",
       "commission_rate": 1428,
       "url": ""
     },{
-      "name": "biosbpi",
+      "name": "codex.bpi",
       "bpkey": "#PUB#6TPxVLE48KEHdC1L7MKB3coaUQCm8c3TkJpRDAEXJ5VLvv2XW9",
       "commission_rate": 1250,
       "url": ""
     },{
-      "name": "biosbpj",
+      "name": "codex.bpj",
       "bpkey": "#PUB#5CyZV8LTi3zGuecX2HHTZm2jWmjyYZTjXDVxcSKf7WeHdywGkt",
       "commission_rate": 1111,
       "url": ""
     },{
-      "name": "biosbpk",
+      "name": "codex.bpk",
       "bpkey": "#PUB#4uiZknFgTrgDTmTraJ3oKL4fdPbkApDrXh1LzohZyVtsfyhXs5",
       "commission_rate": 1000,
       "url": ""
     },{
-      "name": "biosbpl",
+      "name": "codex.bpl",
       "bpkey": "#PUB#5bPhL6JNbx48dxrTtkAbp9ekLGWRuGbsP6QPhExR4Xmf16kWaD",
       "commission_rate": 909,
       "url": ""
     },{
-      "name": "biosbpm",
+      "name": "codex.bpm",
       "bpkey": "#PUB#7J7H1eKtpHfDSHQVB35YnSNXJ11ajAJins95beMQE4NUkYP3B4",
       "commission_rate": 833,
       "url": ""
     },{
-      "name": "biosbpn",
+      "name": "codex.bpn",
       "bpkey": "#PUB#72CbddAqDxsQQGcRdLCPfYyQ2HQg65qE5tJUdgomw17NgHsNfu",
       "commission_rate": 769,
       "url": ""
     },{
-      "name": "biosbpo",
+      "name": "codex.bpo",
       "bpkey": "#PUB#5GV5SsDYy593pqDJUcqVHmpXwT8krVYFHAWVcgqXXNe3df1p8Z",
       "commission_rate": 714,
       "url": ""
     },{
-      "name": "biosbpp",
+      "name": "codex.bpp",
       "bpkey": "#PUB#57sGRRgj8CKuKZHrdyMQUfUPqQVuDGRBp79qtPdwauq4hFSoLR",
       "commission_rate": 666,
       "url": ""
     },{
-      "name": "biosbpq",
+      "name": "codex.bpq",
       "bpkey": "#PUB#5rFrrDeN64D7bCC7FLjTXfaTjfewe3wdoxSZmwZ7BrN8EkA211",
       "commission_rate": 625,
       "url": ""
     },{
-      "name": "biosbpr",
+      "name": "codex.bpr",
       "bpkey": "#PUB#65K5wm8eZYQ7VLL9Afp3g5pN2keN7uXnzno7K9nYn7HE522bqb",
       "commission_rate": 588,
       "url": ""
     },{
-      "name": "biosbps",
+      "name": "codex.bps",
       "bpkey": "#PUB#5hnnkcVKpMJZWXqaS6vTqC82rwgwPyctRrdLAR64j7rrk2MfsP",
       "commission_rate": 555,
       "url": ""
     },{
-      "name": "biosbpt",
+      "name": "codex.bpt",
       "bpkey": "#PUB#8LDwUz9eFC6yurZ4qbfgLKMkeLmKvJHqgATztX65q8WjnmCT87",
       "commission_rate": 526,
       "url": ""
     },{
-      "name": "biosbpu",
+      "name": "codex.bpu",
       "bpkey": "#PUB#5iXZvUM5sES654piXwpEPVLHun7oQ2BeLTTdgHYRzhdbh4asvF",
       "commission_rate": 500,
       "url": ""
     },{
-      "name": "biosbpv",
+      "name": "codex.bpv",
       "bpkey": "#PUB#7hSvvjJKybkicTYhMPUhc9mRBf9kudRcpWECHUHxH17erc6RnA",
       "commission_rate": 476,
       "url": ""
     },{
-      "name": "biosbpw",
+      "name": "codex.bpw",
       "bpkey": "#PUB#76Hb2nxXXawehsLQ6U4uCRCFP5uwnP24J5R9zpefXczvuHByko",
       "commission_rate": 10000,
       "url": ""

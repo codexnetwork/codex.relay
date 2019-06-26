@@ -116,7 +116,7 @@ def setFee(account, act, fee, cpu, net, ram):
 
 def getRAM(account, ram):
     cleos("push action %s freeze '{\"voter\":\"%s\", \"stake\":\"%s\"}' -p %s" % (root_account, account, intToCurrency(ram), account))
-    cleos("push action %s vote4ram '{\"voter\":\"%s\",\"bpname\":\"biosbpa\",\"stake\":\"%s\"}' -p %s" % (root_account, account, intToCurrency(ram), account))
+    cleos("push action %s vote4ram '{\"voter\":\"%s\",\"bpname\":\"codex.bpa\",\"stake\":\"%s\"}' -p %s" % (root_account, account, intToCurrency(ram), account))
 
 def setContract(account):
     getRAM(account, 50000 * 10000)
