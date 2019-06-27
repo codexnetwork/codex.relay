@@ -39,11 +39,11 @@ namespace eosio {
          inline asset get_supply( symbol_name sym ) const;
          inline asset get_balance( account_name owner, symbol_name sym ) const;
 
-         void trade( account_name   from,
-                     account_name   to,
-                     asset          quantity,
-                     trade_func_typ type,
-                     std::string    memo );
+         void trade( account_name           from,
+                     account_name           to,
+                     asset                  quantity,
+                     codex::trade::func_typ type,
+                     std::string            memo );
 
          void castcoin( account_name from, account_name to, asset quantity );
          void takecoin( account_name to );

@@ -69,7 +69,7 @@ namespace relay {
                   account_name to,
                   name chain,
                   asset quantity,
-                  trade_func_typ type,
+                  codex::trade::func_typ type,
                   std::string memo);
 
       /// @abi action

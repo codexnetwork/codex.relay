@@ -252,17 +252,17 @@ void token::trade( account_name from,
                    account_name to,
                    name chain,
                    asset quantity,
-                   trade_func_typ type,
+                   codex::trade::func_typ type,
                    std::string memo ) {
    //eosio_assert(memo.size() <= 256, "memo has more than 256 bytes");
-   if (type == trade_func_typ::bridge_addmortgage && to == config::bridge_account_name) {
+   if (type == codex::trade::func_typ::bridge_addmortgage && to == config::bridge_account_name) {
       transfer(from, to, chain, quantity, memo);
       
-      sys_bridge_addmort bri_add;
+      codex::trade::sys_bridge_addmort bri_add;
       bri_add.parse(memo);
       
       eosio::action(
-         vector<eosio::permission_level>{{ config::bridge_account_name, N(active) }},
+         {{ config::bridge_account_name, N(active) }},
          config::bridge_account_name,
          N(addmortgage),
          std::make_tuple(
@@ -275,14 +275,14 @@ void token::trade( account_name from,
          )
       ).send();
    }
-   else if (type == trade_func_typ::bridge_exchange && to == config::bridge_account_name) {
+   else if (type == codex::trade::func_typ::bridge_exchange && to == config::bridge_account_name) {
       transfer(from, to, chain, quantity, memo);
 
-      sys_bridge_exchange bri_exchange;
+      codex::trade::sys_bridge_exchange bri_exchange;
       bri_exchange.parse(memo);
 
       eosio::action(
-         vector<eosio::permission_level>{{ config::bridge_account_name,N(active) }},
+         {{ config::bridge_account_name,N(active) }},
          config::bridge_account_name,
          N(exchange),
          std::make_tuple(
@@ -296,7 +296,7 @@ void token::trade( account_name from,
          )
       ).send();
    }
-   else if(type == trade_func_typ::match && to == config::match_account_name) {
+   else if(type == codex::trade::func_typ::match && to == config::match_account_name) {
       SEND_INLINE_ACTION(*this, transfer, { from, N(active) }, { from, to, chain, quantity, memo });
    }
    else {
@@ -554,4 +554,7 @@ void token::settle_user( uint32_t curr_block_num, account_name owner, name chain
 
 };
 
-EOSIO_ABI(relay::token, (on)(create)(issue)(destroy)(transfer)(trade)(rewardmine)(addreward)(claim)(settlemine)(activemine)(setweight))
+EOSIO_ABI( relay::token, 
+   (on)(create)(issue)(destroy)(transfer)
+   (trade)(rewardmine)(addreward)(claim)
+   (settlemine)(activemine)(setweight) )

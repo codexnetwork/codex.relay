@@ -8,7 +8,8 @@
 #include <eosiolib/types.hpp>
 #include <eosiolib/eosio.hpp>
 
-namespace eosio {
+namespace codex {
+namespace trade {
 
    namespace __details {
       void splitMemo( std::vector<std::string>& results, const std::string& memo, char separator ) {
@@ -25,7 +26,7 @@ namespace eosio {
       }
    }
 
-   enum class trade_func_typ : uint64_t {
+   enum class func_typ : uint64_t {
       match              = 1,
       bridge_addmortgage = 2,
       bridge_exchange    = 3,
@@ -33,7 +34,7 @@ namespace eosio {
    };
 
    struct sys_bridge_addmort {
-      name         trade_name;
+      eosio::name  trade_name;
       account_name trade_maker = 0;
       uint64_t     type        = 0;
 
@@ -54,7 +55,7 @@ namespace eosio {
    };
 
    struct sys_bridge_exchange {
-      name         trade_name;
+      eosio::name  trade_name;
       account_name trade_maker = 0;
       account_name recv        = 0;
       uint64_t     type;
@@ -75,6 +76,8 @@ namespace eosio {
                        "type is not adapted with bridge_addmortgage" );
       }
    };
+   
+} // namespace trade
 } // namespace codex
 
 #endif // CODEX_INCLUED_SYS_MATCH_DEFINES_HPP_
