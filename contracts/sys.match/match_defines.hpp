@@ -9,6 +9,39 @@
 #include <eosiolib/eosio.hpp>
 
 namespace codex {
+
+namespace utils{
+  constexpr inline int64_t precision( uint64_t decimals ) {
+      constexpr uint64_t res_size = 18;
+      constexpr int64_t res[res_size] = 
+         {  1, 10, 100, 1000, 10000, 
+            100000, 
+            1000000, 
+            10000000,
+            100000000,
+            1000000000,
+            10000000000,
+            100000000000,
+            1000000000000,
+            10000000000000,
+            100000000000000,
+            1000000000000000,
+            10000000000000000,
+            100000000000000000 };
+
+      if( decimals < res_size ) {
+         return res[decimals];
+      } else {
+         auto p10 = res[res_size - 1];
+         for( auto p = static_cast<int64_t>(decimals - res_size + 1); 
+              p > 0; --p ) {
+            p10 *= 10;
+         }
+         return p10;
+      }
+   }
+}
+
 namespace trade {
 
    namespace __details {

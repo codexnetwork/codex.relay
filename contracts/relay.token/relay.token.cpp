@@ -13,6 +13,8 @@
 
 namespace relay {
 
+using codex::utils::precision;
+
 // just a test version by contract
 void token::on( name chain, const checksum256 block_id, const force::relay::action& act ) {
    require_auth(config::relay_account_name); // TODO use config
@@ -232,16 +234,6 @@ void token::add_balance( uint32_t curr_block_num, account_name owner, name chain
          a.balance += value; 
       } );
    }
-}
-
-int64_t precision(uint64_t decimals)
-{
-   int64_t p10 = 1;
-   int64_t p = (int64_t)decimals;
-   while( p > 0  ) {
-      p10 *= 10; --p;
-   }
-   return p10;
 }
 
 void token::trade( account_name from,
