@@ -12,6 +12,8 @@ namespace codex {
 namespace trade {
 
    namespace __details {
+      
+      // TODO: Need refactor split func
       void splitMemo( std::vector<std::string>& results, const std::string& memo, char separator ) {
          auto start = memo.cbegin();
          auto end = memo.cend();
