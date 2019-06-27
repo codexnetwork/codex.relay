@@ -88,10 +88,7 @@ void token::create( account_name issuer,
       s.reward_size = 0;
       s.coin_weight = BASE_COIN_WEIGHT;
    });
-
-
 }
-
 
 void token::issue( name chain, account_name to, asset quantity, std::string memo ) {
    auto sym = quantity.symbol;
@@ -104,7 +101,6 @@ void token::issue( name chain, account_name to, asset quantity, std::string memo
    eosio_assert(existing != statstable.end(), "token with symbol does not exist, create token before issue");
    const auto& st = *existing;
 
-   // TODO auth
    require_auth(st.issuer);
 
    eosio_assert(quantity.is_valid(), "invalid quantity");
@@ -164,6 +160,7 @@ void token::transfer( account_name from,
    eosio_assert(from != to, "cannot transfer to self");
    require_auth(from);
    eosio_assert(is_account(to), "to account does not exist");
+
    auto sym = quantity.symbol.name();
    stats statstable(_self, chain);
    const auto& st = statstable.get(sym);
@@ -198,43 +195,42 @@ void token::sub_balance( uint32_t curr_block_num, account_name owner, name chain
 }
 
 void token::add_balance( uint32_t curr_block_num, account_name owner, name chain, const asset& value, account_name ram_payer ) {
-   accounts to_acnts(_self, owner);
-   account_next_ids acntids(_self, owner);
+   accounts to_acnts( _self, owner );
+   account_next_ids acntids( _self, owner );
 
-   auto idx = to_acnts.get_index<N(bychain)>();
+   auto idx = to_acnts.get_index<N( bychain )>();
 
-   auto to = idx.find(get_account_idx(chain, value));
+   auto to = idx.find( get_account_idx( chain, value ) );
    if( to == idx.end() ) {
       uint64_t id = 1;
-      auto ids = acntids.find(owner);
-      if(ids == acntids.end()){
-         acntids.emplace(ram_payer, [&]( auto& a ){
+      const auto ids = acntids.find( owner );
+      if( ids == acntids.end() ) {
+         acntids.emplace( ram_payer, [&]( auto& a ) {
             a.id = 2;
             a.account = owner;
-         });
-      }else{
+         } );
+      } else {
          id = ids->id;
-         acntids.modify(ids, 0, [&]( auto& a ) {
+         acntids.modify( ids, 0, [&]( auto& a ) { 
             a.id++;
-         });
+         } );
       }
 
-      to_acnts.emplace(ram_payer, [&]( auto& a ) {
+      to_acnts.emplace( ram_payer, [&]( auto& a ) {
          a.id = id;
          a.balance = value;
          a.chain = chain;
          a.mineage = 0;
          a.mineage_update_height = curr_block_num;
-      });
-   } else { 
-      settle_user(curr_block_num, owner, chain, value);
-      accounts to_acnts_temp(_self, owner);
-      idx = to_acnts_temp.get_index<N(bychain)>();
-      to = idx.find(get_account_idx(chain, value));
-      idx.modify(to, 0, [&]( auto& a ) {
-         a.balance += value;
-      });
-      
+      } );
+   } else {
+      settle_user( curr_block_num, owner, chain, value );
+      accounts to_acnts_temp( _self, owner );
+      idx = to_acnts_temp.get_index<N( bychain )>();
+      to = idx.find( get_account_idx( chain, value ) );
+      idx.modify( to, 0, [&]( auto& a ) { 
+         a.balance += value; 
+      } );
    }
 }
 
@@ -278,51 +274,44 @@ void token::trade( account_name from,
 }
 
 void token::addreward(name chain,asset supply,int32_t reward_now) {
-   require_auth(::config::system_account_name);
+   require_auth( config::system_account_name );
 
-   auto sym = supply.symbol;
-   eosio_assert(sym.is_valid(), "invalid symbol name");
+   const auto sym = supply.symbol;
+   eosio_assert( sym.is_valid(), "invalid symbol name" );
 
-   stats statstable(_self, chain);
-   auto existing = statstable.find(supply.symbol.name());
-   eosio_assert(existing != statstable.end(), "token with symbol do not exists");
+   stats statstable( _self, chain );
+   auto existing = statstable.find( supply.symbol.name() );
+   eosio_assert( existing != statstable.end(), "token with symbol do not exists" );
 
-   rewards rewardtable(_self, _self);
-   auto idx = rewardtable.get_index<N(bychain)>();
-   auto con = idx.find(get_account_idx(chain, supply));
+   rewards rewardtable( _self, _self );
+   auto idx = rewardtable.get_index<N( bychain )>();
+   auto con = idx.find( get_account_idx( chain, supply ) );
 
-   eosio_assert(con == idx.end(), "token with symbol already exists");
+   eosio_assert( con == idx.end(), "token with symbol already exists" );
 
    auto reward_id = rewardtable.available_primary_key();
-   rewardtable.emplace(_self, [&]( auto& s ) {
-      s.id = reward_id;
-      s.supply = supply;
-      s.chain = chain;
-      if (reward_now == 1){
-         s.reward_now = true;
-      }
-      else {
-         s.reward_now = false;
-      }
-   });
+   rewardtable.emplace( _self, [&]( auto& s ) {
+      s.id         = reward_id;
+      s.supply     = supply;
+      s.chain      = chain;
+      s.reward_now = ( reward_now == 1 );
+   } );
 
-   statstable.modify(*existing,0,[&]( auto& s ){
+   statstable.modify( *existing, 0, [&]( auto& s ) {
       s.reward_scope = reward_id;
-      s.reward_size = 1;
-   }); 
+      s.reward_size  = 1;
+   } );
 
    const auto current_block = current_block_num();
-   reward_mine reward_inf(_self,reward_id);
-   auto reward_info = reward_inf.find(current_block);
-   eosio_assert(reward_info == reward_inf.end(),"the reward info already exist");
+   reward_mine reward_inf( _self, reward_id );
+   auto reward_info = reward_inf.find( current_block );
+   eosio_assert( reward_info == reward_inf.end(), "the reward info already exist" );
 
-   reward_inf.emplace(_self,[&]( auto& s ) {
-      s.total_mineage = 0;
-      s.reward_pool = asset(0);
+   reward_inf.emplace( _self, [&]( auto& s ) {
+      s.total_mineage    = 0;
+      s.reward_pool      = asset( 0 );
       s.reward_block_num = current_block;
-   });
-
-   
+   } );
 }
 
 void token::rewardmine(asset quantity) {
@@ -411,14 +400,12 @@ void token::settlemine( account_name system_account ) {
       } );
 
       if( existing->reward_size == COIN_REWARD_RECORD_SIZE ) {
-         auto reward_begin = reward_inf.begin();
-         auto reward_second = ++reward_begin;
+         auto reward_second = ++(reward_inf.begin());
          reward_inf.modify( *reward_second, 0, [&]( auto& s ) { 
             s.reward_pool = asset{0};
          } );
 
-         reward_begin = reward_inf.begin();
-         reward_inf.erase( reward_begin );
+         reward_inf.erase( reward_inf.begin() );
       }
 
       statstable.modify( *existing, 0, [&]( auto& s ) {
@@ -431,53 +418,50 @@ void token::settlemine( account_name system_account ) {
    }
 }
 
-void token::activemine(account_name system_account) {
+void token::activemine( account_name system_account ) {
    require_auth( config::system_account_name );
    rewards rewardtable( _self, _self );
    for( const auto& reward : rewardtable ) {
-      rewardtable.modify( reward, 0, [&]( auto& s ) {
-         s.reward_now = true;
+      rewardtable.modify( reward, 0, [&]( auto& s ) { 
+         s.reward_now = true; 
       } );
    }
 }
 
-//todo
-void token::claim(name chain,asset quantity,account_name receiver) {
-
-   require_auth(receiver);
+void token::claim( name chain, asset quantity, account_name receiver ) {
+   require_auth( receiver );
    auto sym = quantity.symbol;
-   eosio_assert(sym.is_valid(), "invalid symbol name");
+   eosio_assert( sym.is_valid(), "invalid symbol name" );
 
    const auto current_block = current_block_num();
-   
-   rewards rewardtable(_self, _self);
-   auto idx = rewardtable.get_index<N(bychain)>();
-   auto con = idx.find(get_account_idx(chain, quantity));
-   eosio_assert(con != idx.end(), "token with symbol donot participate in dividends ");
+   const auto account_idx   = get_account_idx( chain, quantity );
 
-   stats statstable(_self, chain);
-   auto existing = statstable.find(quantity.symbol.name());
-   eosio_assert(existing != statstable.end(), "token with symbol already exists");
+   rewards rewardtable( _self, _self );
+   auto idx = rewardtable.get_index<N( bychain )>();
+   auto con = idx.find( account_idx );
+   eosio_assert( con != idx.end(), "token with symbol donot participate in dividends " );
 
-   settle_user(current_block,receiver,chain,quantity);
+   stats statstable( _self, chain );
+   auto existing = statstable.find( quantity.symbol.name() );
+   eosio_assert( existing != statstable.end(), "token with symbol already exists" );
 
-   accounts to_acnts(_self, receiver);
-   auto idxx = to_acnts.get_index<N(bychain)>();
-   const auto& to = idxx.get(get_account_idx(chain, quantity), "no balance object found");
-   eosio_assert(to.chain == chain, "symbol chain mismatch");
-   
-   auto total_reward = to.reward;
+   settle_user( current_block, receiver, chain, quantity );
 
-   to_acnts.modify(to, receiver, [&]( auto& a ) {
-      a.reward = asset(0);
-   });
+   accounts to_acnts( _self, receiver );
+   auto idx_to_acnts = to_acnts.get_index<N( bychain )>();
+   const auto& to = idx_to_acnts.get( account_idx, "no balance object found" );
+   eosio_assert( to.chain == chain, "symbol chain mismatch" );
 
-   eosio_assert(total_reward > asset(100000),"claim amount must > 10");
-   eosio::action(
-           permission_level{ config::reward_account_name, N(active) },
-           config::token_account_name, N(castcoin),
-           std::make_tuple(config::reward_account_name, receiver,total_reward)
-   ).send();
+   const auto total_reward = to.reward;
+
+   to_acnts.modify( to, receiver, [&]( auto& a ) { a.reward = asset( 0 ); } );
+
+   eosio_assert( total_reward > asset( 10 * 10000 ), "claim amount must > 10" );
+   eosio::action( { { config::reward_account_name, N( active ) } },
+                  config::token_account_name,
+                  N( castcoin ),
+                  std::make_tuple( config::reward_account_name, receiver, total_reward ) )
+     .send();
 }
 
 void token::settle_user( uint32_t curr_block_num, account_name owner, name chain, const asset& value ) {
