@@ -6,30 +6,9 @@
 #include <eosiolib/eosio.hpp>
 #include <eosiolib/asset.hpp>
 
+#include "sys.match/match_defines.hpp"
+
 namespace eosio {
-   // TODO by CODEREVIEW need make one for force.token and relay.token
-   struct sys_bridge_addmort {
-      name trade_name;
-      account_name trade_maker;
-      uint64_t type;
-      void parse( const std::string& memo );
-   };
-
-   struct sys_bridge_exchange {
-      name trade_name;
-      account_name trade_maker;
-      account_name recv;
-      uint64_t type;
-      void parse( const std::string& memo );
-   };
-
-   enum class func_type : uint64_t {
-      match              = 1,
-      bridge_addmortgage = 2,
-      bridge_exchange    = 3,
-      trade_type_count   = 4
-   };
-
    #ifdef BEFORE_ONLINE_TEST   
    static constexpr uint32_t PRE_CAST_NUM = 28800;
    static constexpr uint32_t STABLE_CAST_NUM = 7200;
@@ -63,7 +42,7 @@ namespace eosio {
          void trade( account_name   from,
                      account_name   to,
                      asset          quantity,
-                     func_type      type,
+                     trade_func_typ type,
                      std::string    memo );
 
          void castcoin( account_name from, account_name to, asset quantity );

@@ -3,9 +3,12 @@
  *  @copyright defined in eos/LICENSE.txt
  */
 
+#include <boost/algorithm/string.hpp>
+
 #include "force.token.hpp"
 #include "sys.match/sys.match.hpp"
-#include <boost/algorithm/string.hpp>
+
+#include "sys.match/match_defines.hpp"
 
 namespace eosio {
 
@@ -229,9 +232,9 @@ void token::add_balance( account_name owner, asset value, account_name ram_payer
 void token::trade(account_name from,
                   account_name to,
                   asset quantity,
-                  func_type type,
+                  trade_func_typ type,
                   std::string memo ) {
-   if (type == func_type::bridge_addmortgage && to == config::bridge_account_name) {
+   if (type == trade_func_typ::bridge_addmortgage && to == config::bridge_account_name) {
       transfer(from, to,  quantity, memo);
       
       sys_bridge_addmort bri_add;
@@ -246,7 +249,7 @@ void token::trade(account_name from,
          )
       ).send();
    }
-   else if (type == func_type::bridge_exchange && to == config::bridge_account_name) {
+   else if (type == trade_func_typ::bridge_exchange && to == config::bridge_account_name) {
       transfer(from, to, quantity, memo);
 
       sys_bridge_exchange bri_exchange;
@@ -261,48 +264,12 @@ void token::trade(account_name from,
          )
       ).send();
    }
-   else if(type == func_type::match && to == config::match_account_name) {
+   else if(type == trade_func_typ::match && to == config::match_account_name) {
       SEND_INLINE_ACTION(*this, transfer, { from, N(active) }, { from, to, quantity, memo });
    }
    else {
       eosio_assert(false,"invalid type");
    }
-}
-
-void splitMemo(std::vector<std::string>& results, const std::string& memo,char separator) {
-   auto start = memo.cbegin();
-   auto end = memo.cend();
-
-   for( auto it = start; it != end; ++it ) {
-     if( *it == separator ) {
-         results.emplace_back(start, it);
-         start = it + 1;
-      }
-   }
-   if (start != end) results.emplace_back(start, end);
-}
-
-void sys_bridge_addmort::parse( const std::string& memo ) {
-   std::vector<std::string> memoParts;
-   memoParts.reserve(8);
-   splitMemo(memoParts, memo, ';');
-   eosio_assert(memoParts.size() == 3,"memo is not adapted with bridge_addmortgage");
-   this->trade_name.value = ::eosio::string_to_name(memoParts[0].c_str());
-   this->trade_maker = ::eosio::string_to_name(memoParts[1].c_str());
-   this->type = atoi(memoParts[2].c_str());
-   eosio_assert(this->type == 1 || this->type == 2,"type is not adapted with bridge_addmortgage");
-}
-
-void sys_bridge_exchange::parse( const std::string& memo ) {
-   std::vector<std::string> memoParts;
-   memoParts.reserve(8);
-   splitMemo(memoParts, memo, ';');
-   eosio_assert(memoParts.size() == 4,"memo is not adapted with bridge_addmortgage");
-   this->trade_name.value = ::eosio::string_to_name(memoParts[0].c_str());
-   this->trade_maker = ::eosio::string_to_name(memoParts[1].c_str());
-   this->recv = ::eosio::string_to_name(memoParts[2].c_str());
-   this->type = atoi(memoParts[3].c_str());
-   eosio_assert(this->type == 1 || this->type == 2,"type is not adapted with bridge_addmortgage");
 }
 
 } /// namespace eosio

@@ -9,6 +9,7 @@
 #include "force.relay/force.relay.hpp"
 #include "relay.token.hpp"
 
+#include "sys.match/match_defines.hpp"
 
 namespace relay {
 
@@ -47,7 +48,7 @@ void token::on( name chain, const checksum256 block_id, const force::relay::acti
       print("data.memo err");
       return;
    }
-   const auto to = name::string_to_name(data.memo.c_str());
+   const auto to = ::eosio::string_to_name(data.memo.c_str());
    if( !is_account(to) ) {
       // TODO param err processing
       print("to is no account");
@@ -251,10 +252,10 @@ void token::trade( account_name from,
                    account_name to,
                    name chain,
                    asset quantity,
-                   trade_type type,
+                   trade_func_typ type,
                    std::string memo ) {
    //eosio_assert(memo.size() <= 256, "memo has more than 256 bytes");
-   if (type == trade_type::bridge_addmortgage && to == config::bridge_account_name) {
+   if (type == trade_func_typ::bridge_addmortgage && to == config::bridge_account_name) {
       transfer(from, to, chain, quantity, memo);
       
       sys_bridge_addmort bri_add;
@@ -265,11 +266,16 @@ void token::trade( account_name from,
          config::bridge_account_name,
          N(addmortgage),
          std::make_tuple(
-               bri_add.trade_name.value,bri_add.trade_maker,from,chain,quantity,bri_add.type
+               bri_add.trade_name.value,
+               bri_add.trade_maker,
+               from,
+               chain,
+               quantity,
+               bri_add.type
          )
       ).send();
    }
-   else if (type == trade_type::bridge_exchange && to == config::bridge_account_name) {
+   else if (type == trade_func_typ::bridge_exchange && to == config::bridge_account_name) {
       transfer(from, to, chain, quantity, memo);
 
       sys_bridge_exchange bri_exchange;
@@ -280,11 +286,17 @@ void token::trade( account_name from,
          config::bridge_account_name,
          N(exchange),
          std::make_tuple(
-               bri_exchange.trade_name.value,bri_exchange.trade_maker,from,bri_exchange.recv,chain,quantity,bri_exchange.type
+               bri_exchange.trade_name.value,
+               bri_exchange.trade_maker,
+               from,
+               bri_exchange.recv,
+               chain,
+               quantity,
+               bri_exchange.type
          )
       ).send();
    }
-   else if(type == trade_type::match && to == config::match_account_name) {
+   else if(type == trade_func_typ::match && to == config::match_account_name) {
       SEND_INLINE_ACTION(*this, transfer, { from, N(active) }, { from, to, chain, quantity, memo });
    }
    else {
@@ -538,39 +550,6 @@ void token::settle_user( uint32_t curr_block_num, account_name owner, name chain
 
       a.mineage_update_height = curr_block_num;
    } );
-}
-
-void splitMemo(std::vector<std::string>& results, const std::string& memo,char separator) {
-   auto start = memo.cbegin();
-   auto end = memo.cend();
-
-   for (auto it = start; it != end; ++it) {
-     if (*it == separator) {
-         results.emplace_back(start, it);
-         start = it + 1;
-     }
-   }
-   if (start != end) results.emplace_back(start, end);
-}
-void sys_bridge_addmort::parse(const std::string& memo) {
-   std::vector<std::string> memoParts;
-   splitMemo(memoParts, memo, ';');
-   eosio_assert(memoParts.size() == 3,"memo is not adapted with bridge_addmortgage");
-   this->trade_name.value = ::eosio::string_to_name(memoParts[0].c_str());
-   this->trade_maker = ::eosio::string_to_name(memoParts[1].c_str());
-   this->type = atoi(memoParts[2].c_str());
-   eosio_assert(this->type == 1 || this->type == 2,"type is not adapted with bridge_addmortgage");
-}
-
-void sys_bridge_exchange::parse(const std::string& memo) {
-   std::vector<std::string> memoParts;
-   splitMemo(memoParts, memo, ';');
-   eosio_assert(memoParts.size() == 4,"memo is not adapted with bridge_addmortgage");
-   this->trade_name.value = ::eosio::string_to_name(memoParts[0].c_str());
-   this->trade_maker = ::eosio::string_to_name(memoParts[1].c_str());
-   this->recv = ::eosio::string_to_name(memoParts[2].c_str());
-   this->type = atoi(memoParts[3].c_str());
-   eosio_assert(this->type == 1 || this->type == 2,"type is not adapted with bridge_addmortgage");
 }
 
 };
