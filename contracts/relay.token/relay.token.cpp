@@ -254,55 +254,31 @@ void token::trade( account_name from,
                    asset quantity,
                    codex::trade::func_typ type,
                    std::string memo ) {
-   //eosio_assert(memo.size() <= 256, "memo has more than 256 bytes");
-   if (type == codex::trade::func_typ::bridge_addmortgage && to == config::bridge_account_name) {
-      transfer(from, to, chain, quantity, memo);
-      
-      codex::trade::sys_bridge_addmort bri_add;
-      bri_add.parse(memo);
-      
-      eosio::action(
-         {{ config::bridge_account_name, N(active) }},
-         config::bridge_account_name,
-         N(addmortgage),
-         std::make_tuple(
-               bri_add.trade_name.value,
-               bri_add.trade_maker,
-               from,
-               chain,
-               quantity,
-               bri_add.type
-         )
-      ).send();
+   switch( type ) {
+      case codex::trade::func_typ::bridge_addmortgage : {
+         transfer(from, to, chain, quantity, memo);
+         eosio_assert( to == config::bridge_account_name, "to account should be bridge account" );
+         codex::trade::sys_bridge_addmort bri_add;
+         bri_add.parse( memo );
+         bri_add.done( chain, from, quantity );
+         break;
+      }
+      case codex::trade::func_typ::bridge_exchange : {
+         transfer(from, to, chain, quantity, memo);
+         eosio_assert( to == config::bridge_account_name, "to account should be bridge account" );
+         codex::trade::sys_bridge_exchange bri_exchange;
+         bri_exchange.parse( memo );
+         bri_exchange.done( chain, from, quantity );
+         break;
+      }
+      case codex::trade::func_typ::match : {
+         eosio_assert( to == config::match_account_name, "to account should be match account" );
+         SEND_INLINE_ACTION(*this, transfer, { from, N(active) }, { from, to, chain, quantity, memo });
+         break;
+      }
+      default:
+         eosio_assert(false, "invalid trade type");
    }
-   else if (type == codex::trade::func_typ::bridge_exchange && to == config::bridge_account_name) {
-      transfer(from, to, chain, quantity, memo);
-
-      codex::trade::sys_bridge_exchange bri_exchange;
-      bri_exchange.parse(memo);
-
-      eosio::action(
-         {{ config::bridge_account_name,N(active) }},
-         config::bridge_account_name,
-         N(exchange),
-         std::make_tuple(
-               bri_exchange.trade_name.value,
-               bri_exchange.trade_maker,
-               from,
-               bri_exchange.recv,
-               chain,
-               quantity,
-               bri_exchange.type
-         )
-      ).send();
-   }
-   else if(type == codex::trade::func_typ::match && to == config::match_account_name) {
-      SEND_INLINE_ACTION(*this, transfer, { from, N(active) }, { from, to, chain, quantity, memo });
-   }
-   else {
-      eosio_assert(false,"invalid trade type");
-   }
-   
 }
 
 void token::addreward(name chain,asset supply,int32_t reward_now) {

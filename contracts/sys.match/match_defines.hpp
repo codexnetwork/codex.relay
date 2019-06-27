@@ -52,6 +52,24 @@ namespace trade {
          eosio_assert( this->type == 1 || this->type == 2,
                        "type is not adapted with bridge_addmortgage" );
       }
+
+      void done( const eosio::name& chain, 
+                 account_name from, 
+                 const eosio::asset& quantity ) const {
+         eosio::action(
+            {{ config::bridge_account_name, N(active) }},
+            config::bridge_account_name,
+            N(addmortgage),
+            std::make_tuple(
+                  trade_name.value,
+                  trade_maker,
+                  from,
+                  chain,
+                  quantity,
+                  type
+            )
+         ).send();
+      }
    };
 
    struct sys_bridge_exchange {
@@ -60,7 +78,7 @@ namespace trade {
       account_name recv        = 0;
       uint64_t     type;
 
-      inline void parse( const std::string& memo ){
+      inline void parse( const std::string& memo ) {
          std::vector<std::string> memoParts;
          memoParts.reserve( 8 );
          __details::splitMemo( memoParts, memo, ';' );
@@ -74,6 +92,25 @@ namespace trade {
 
          eosio_assert( this->type == 1 || this->type == 2,
                        "type is not adapted with bridge_addmortgage" );
+      }
+
+      void done( const eosio::name& chain, 
+                 account_name from, 
+                 const eosio::asset& quantity ) const {
+         eosio::action(
+            {{ config::bridge_account_name,N(active) }},
+            config::bridge_account_name,
+            N(exchange),
+            std::make_tuple(
+                  trade_name.value,
+                  trade_maker,
+                  from,
+                  recv,
+                  chain,
+                  quantity,
+                  type
+            )
+         ).send();
       }
    };
    
