@@ -696,7 +696,7 @@ namespace eosiosystem {
         { config::system_account_name, N( active ) },
         { config::system_account_name,
           bp_punish->initiator,
-          reward_initiator + PUNISH_BP_FEE,
+          reward_initiator + asset{PUNISH_BP_FEE},
           "cancle punishbp deposit" } );
       punish_bp.erase( bp_punish );
 
@@ -736,7 +736,7 @@ namespace eosiosystem {
       INLINE_ACTION_SENDER(force::token, transfer)(
          ::config::token_account_name,
          { initiator, N(active) },
-         { initiator, ::config::system_account_name, PUNISH_BP_FEE, "punishbp deposit" });
+         { initiator, ::config::system_account_name, asset{PUNISH_BP_FEE}, "punishbp deposit" });
 
       last_drain_bp drain_bp_tbl(_self,_self);
       auto drainbp = drain_bp_tbl.find(bpname); 
@@ -752,7 +752,7 @@ namespace eosiosystem {
          INLINE_ACTION_SENDER(force::token, transfer)(
             ::config::token_account_name,
             { ::config::system_account_name, N(active) },
-            { ::config::system_account_name, bp_punish->initiator, PUNISH_BP_FEE, "cancle punishbp return deposit" });
+            { ::config::system_account_name, bp_punish->initiator, asset{PUNISH_BP_FEE}, "cancle punishbp return deposit" });
 
          punish_bp.erase(bp_punish);
 
@@ -783,7 +783,7 @@ namespace eosiosystem {
          INLINE_ACTION_SENDER(force::token, transfer)(
             config::token_account_name,
             { config::system_account_name, N(active) },
-            { config::system_account_name, initiator, PUNISH_BP_FEE, "cancle punishbp return deposit" });
+            { config::system_account_name, initiator, asset{PUNISH_BP_FEE}, "cancle punishbp return deposit" });
       }
       
       punish_bp.erase(bp_punish);
@@ -842,7 +842,7 @@ namespace eosiosystem {
       INLINE_ACTION_SENDER(force::token, transfer)(
          config::token_account_name,
          { punishbpname, N(active) },
-         { punishbpname, ::config::system_account_name, BAIL_PUNISH_FEE, "bail punish fee" });
+         { punishbpname, ::config::system_account_name, asset{BAIL_PUNISH_FEE}, "bail punish fee" });
 
       bps_table bps_tbl(_self, _self);
       auto punishbp = bps_tbl.find(punishbpname);
