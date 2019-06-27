@@ -256,19 +256,15 @@ void token::trade( account_name from,
                    std::string memo ) {
    switch( type ) {
       case codex::trade::func_typ::bridge_addmortgage : {
-         transfer(from, to, chain, quantity, memo);
+         transfer( from, to, chain, quantity, memo );
          eosio_assert( to == config::bridge_account_name, "to account should be bridge account" );
-         codex::trade::sys_bridge_addmort bri_add;
-         bri_add.parse( memo );
-         bri_add.done( chain, from, quantity );
+         codex::trade::sys_bridge_addmort{ memo }.done( chain, from, quantity );
          break;
       }
       case codex::trade::func_typ::bridge_exchange : {
-         transfer(from, to, chain, quantity, memo);
+         transfer( from, to, chain, quantity, memo );
          eosio_assert( to == config::bridge_account_name, "to account should be bridge account" );
-         codex::trade::sys_bridge_exchange bri_exchange;
-         bri_exchange.parse( memo );
-         bri_exchange.done( chain, from, quantity );
+         codex::trade::sys_bridge_exchange{ memo }.done( chain, from, quantity );
          break;
       }
       case codex::trade::func_typ::match : {

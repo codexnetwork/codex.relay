@@ -38,7 +38,7 @@ namespace trade {
       account_name trade_maker = 0;
       uint64_t     type        = 0;
 
-      inline void parse( const std::string& memo ) {
+      explicit sys_bridge_addmort( const std::string& memo ) {
          std::vector<std::string> memoParts;
          memoParts.reserve( 8 );
          __details::splitMemo( memoParts, memo, ';' );
@@ -49,6 +49,7 @@ namespace trade {
          this->trade_maker = ::eosio::string_to_name( memoParts[1].c_str() );
          this->type = atoi( memoParts[2].c_str() );
 
+         // FIXME: should use enum
          eosio_assert( this->type == 1 || this->type == 2,
                        "type is not adapted with bridge_addmortgage" );
       }
@@ -78,7 +79,7 @@ namespace trade {
       account_name recv        = 0;
       uint64_t     type;
 
-      inline void parse( const std::string& memo ) {
+      explicit sys_bridge_exchange( const std::string& memo ) {
          std::vector<std::string> memoParts;
          memoParts.reserve( 8 );
          __details::splitMemo( memoParts, memo, ';' );
@@ -90,6 +91,7 @@ namespace trade {
          this->recv = ::eosio::string_to_name( memoParts[2].c_str() );
          this->type = atoi( memoParts[3].c_str() );
 
+         // FIXME: should use enum
          eosio_assert( this->type == 1 || this->type == 2,
                        "type is not adapted with bridge_addmortgage" );
       }

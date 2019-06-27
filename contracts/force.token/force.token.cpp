@@ -237,19 +237,15 @@ void token::trade(account_name from,
    constexpr auto chain_name = name{ N(self) };
    switch( type ) {
       case codex::trade::func_typ::bridge_addmortgage : {
-         transfer(from, to, quantity, memo);
+         transfer( from, to, quantity, memo );
          eosio_assert( to == config::bridge_account_name, "to account should be bridge account" );
-         codex::trade::sys_bridge_addmort bri_add;
-         bri_add.parse( memo );
-         bri_add.done( chain_name, from, quantity );
+         codex::trade::sys_bridge_addmort{ memo }.done( chain_name, from, quantity );
          break;
       }
       case codex::trade::func_typ::bridge_exchange : {
-         transfer(from, to, quantity, memo);
+         transfer( from, to, quantity, memo );
          eosio_assert( to == config::bridge_account_name, "to account should be bridge account" );
-         codex::trade::sys_bridge_exchange bri_exchange;
-         bri_exchange.parse( memo );
-         bri_exchange.done( chain_name, from, quantity );
+         codex::trade::sys_bridge_exchange{ memo }.done( chain_name, from, quantity );
          break;
       }
       case codex::trade::func_typ::match : {
