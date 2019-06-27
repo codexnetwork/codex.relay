@@ -8,16 +8,19 @@
 #pragma once
 
 
-//#include <eosio.system/native.hpp>
+#include <string>
+
 #include <eosiolib/asset.hpp>
 #include <eosiolib/time.hpp>
 #include <eosiolib/privileged.hpp>
 #include <eosiolib/singleton.hpp>
 #include <eosiolib/eosio.hpp>
-#include <force.token/force.token.hpp>
-#include <relay.token/relay.token.hpp>
-#include <string>
 
+#include "force.token/force.token.hpp"
+#include "relay.token/relay.token.hpp"
+#include "sys.match/match_defines.hpp"
+
+using codex::utils::precision;
 
 namespace exchange {
    using namespace eosio;
@@ -28,16 +31,6 @@ namespace exchange {
    const uint32_t INTERVAL_BLOCKS = /*172800*/ 24 * 3600 * 1000 / config::block_interval_ms;
 
    typedef double real_type;
-   
-   inline int64_t precision(uint64_t decimals)
-   {
-      int64_t p10 = 1;
-      int64_t p = (int64_t)decimals;
-      while( p > 0  ) {
-         p10 *= 10; --p;
-      }
-      return p10;
-   }
 
    class exchange : public contract  {
 
