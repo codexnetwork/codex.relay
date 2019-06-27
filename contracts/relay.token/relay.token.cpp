@@ -6,8 +6,9 @@
 #include <eosiolib/action.hpp>
 #include <bits/stdint.h>
 
-#include "relay.token.hpp"
 #include "force.relay/force.relay.hpp"
+#include "relay.token.hpp"
+
 
 namespace relay {
 
@@ -46,7 +47,7 @@ void token::on( name chain, const checksum256 block_id, const force::relay::acti
       print("data.memo err");
       return;
    }
-   const auto to = string_to_name(data.memo.c_str());
+   const auto to = name::string_to_name(data.memo.c_str());
    if( !is_account(to) ) {
       // TODO param err processing
       print("to is no account");
@@ -91,7 +92,7 @@ void token::create( account_name issuer,
 }
 
 
-void token::issue( name chain, account_name to, asset quantity, string memo ) {
+void token::issue( name chain, account_name to, asset quantity, std::string memo ) {
    auto sym = quantity.symbol;
    eosio_assert(sym.is_valid(), "invalid symbol name");
    eosio_assert(memo.size() <= 256, "memo has more than 256 bytes");
@@ -125,7 +126,7 @@ void token::issue( name chain, account_name to, asset quantity, string memo ) {
    }
 }
 
-void token::destroy( name chain, account_name from, asset quantity, string memo ) {
+void token::destroy( name chain, account_name from, asset quantity, std::string memo ) {
    require_auth(from);
 
    auto sym = quantity.symbol;
@@ -158,7 +159,7 @@ void token::transfer( account_name from,
                       account_name to,
                       name chain,
                       asset quantity,
-                      string memo ) {
+                      std::string memo ) {
    eosio_assert(from != to, "cannot transfer to self");
    require_auth(from);
    eosio_assert(is_account(to), "to account does not exist");
@@ -181,7 +182,7 @@ void token::transfer( account_name from,
    add_balance(curr_block_num, to, chain, quantity, from);
 }
 
-void token::sub_balance( uint32_t curr_block_num, account_name owner, name chain, asset value ) {
+void token::sub_balance( uint32_t curr_block_num, account_name owner, name chain, const asset& value ) {
    settle_user( curr_block_num, owner, chain, value );
    accounts from_acnts( _self, owner );
    auto idx = from_acnts.get_index<N( bychain )>();
@@ -195,7 +196,7 @@ void token::sub_balance( uint32_t curr_block_num, account_name owner, name chain
    } );
 }
 
-void token::add_balance( uint32_t curr_block_num, account_name owner, name chain, asset value, account_name ram_payer ) {
+void token::add_balance( uint32_t curr_block_num, account_name owner, name chain, const asset& value, account_name ram_payer ) {
    accounts to_acnts(_self, owner);
    account_next_ids acntids(_self, owner);
 
@@ -247,11 +248,11 @@ int64_t precision(uint64_t decimals)
 }
 
 void token::trade( account_name from,
-                  account_name to,
-                  name chain,
-                  asset quantity,
-                  trade_type type,
-                  string memo ) {
+                   account_name to,
+                   name chain,
+                   asset quantity,
+                   trade_type type,
+                   std::string memo ) {
    //eosio_assert(memo.size() <= 256, "memo has more than 256 bytes");
    if (type == trade_type::bridge_addmortgage && to == config::bridge_account_name) {
       transfer(from, to, chain, quantity, memo);
@@ -551,7 +552,7 @@ void splitMemo(std::vector<std::string>& results, const std::string& memo,char s
    }
    if (start != end) results.emplace_back(start, end);
 }
-void sys_bridge_addmort::parse(const string memo) {
+void sys_bridge_addmort::parse(const std::string& memo) {
    std::vector<std::string> memoParts;
    splitMemo(memoParts, memo, ';');
    eosio_assert(memoParts.size() == 3,"memo is not adapted with bridge_addmortgage");
@@ -561,7 +562,7 @@ void sys_bridge_addmort::parse(const string memo) {
    eosio_assert(this->type == 1 || this->type == 2,"type is not adapted with bridge_addmortgage");
 }
 
-void sys_bridge_exchange::parse(const string memo) {
+void sys_bridge_exchange::parse(const std::string& memo) {
    std::vector<std::string> memoParts;
    splitMemo(memoParts, memo, ';');
    eosio_assert(memoParts.size() == 4,"memo is not adapted with bridge_addmortgage");
