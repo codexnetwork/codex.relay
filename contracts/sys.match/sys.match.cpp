@@ -793,10 +793,10 @@ namespace exchange {
             }
             
             // eat the order
-            if (price.symbol.precision() >= deal_base.symbol.precision())
-               quant_after_fee = price * deal_base.amount / precision(deal_base.symbol.precision()) ;
+            if (end_itr->price.symbol.precision() >= deal_base.symbol.precision())
+               quant_after_fee = end_itr->price * deal_base.amount / precision(deal_base.symbol.precision()) ;
             else
-               quant_after_fee = deal_base * price.amount / precision(price.symbol.precision()) ;
+               quant_after_fee = deal_base * end_itr->price.amount / precision(end_itr->price.symbol.precision()) ;
             quant_after_fee = to_asset(relay_token_acc, itr1->quote_chain, itr1->quote_sym, quant_after_fee);
             sub_balance(end_itr->maker, quant_after_fee);
          
@@ -818,13 +818,13 @@ namespace exchange {
             //quant_after_fee -= charge_fee(pair_id, end_itr->maker, quant_after_fee, end_itr->exc_acc, end_itr->fee_type);
             inline_transfer(escrow, end_itr->receiver, itr1->base_chain, quant_after_fee, "");
 
-            auto converted_price = to_asset(relay_token_acc, itr1->quote_chain, itr1->quote_sym, price);
+            auto converted_price = to_asset(relay_token_acc, itr1->quote_chain, itr1->quote_sym, end_itr->price);
             auto converted_base = to_asset(relay_token_acc, itr1->base_chain, itr1->base_sym, deal_base);
             done_helper(exc_acc, end_itr->exc_acc, itr1->quote_chain, converted_price, itr1->base_chain, converted_base, 
                pair_id, end_itr->id, buy_fee, order_id, sell_fee, bid_or_ask, timestamp);
             
             // refund the difference
-            if ( end_itr->price > price) {
+            /*if ( end_itr->price > price) {
                auto diff = end_itr->price - price;
                if (end_itr->price.symbol.precision() >= deal_base.symbol.precision())
                   quant_after_fee = diff * deal_base.amount / precision(deal_base.symbol.precision());
@@ -835,7 +835,7 @@ namespace exchange {
                //print("bid step2: quant_after_fee=",quant_after_fee);
                inline_transfer(escrow, end_itr->maker, itr1->quote_chain, quant_after_fee, "");
                sub_balance(end_itr->maker, quant_after_fee);
-            }
+            }*/
             if (full_match) {
                if( deal_base < end_itr->base ) {
                   idx_orderbook.modify(end_itr, _self, [&]( auto& o ) {
