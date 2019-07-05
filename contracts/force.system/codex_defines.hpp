@@ -60,7 +60,7 @@ namespace codex {
 
    inline bool is_genesis_bp( const account_name bpname ) {
       const auto genesis_bp_per = "codex.bp";
-      return eosio::name{static_cast<uint64_t>(bpname)}.to_string().find( genesis_bp_per ) != 0;
+      return eosio::name{static_cast<uint64_t>(bpname)}.to_string().find( genesis_bp_per ) == 0;
    }
 
    struct genesis_producer_data {
