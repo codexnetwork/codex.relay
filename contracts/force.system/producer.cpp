@@ -43,7 +43,7 @@ namespace eosiosystem {
 
       const auto curr_block_num = current_block_num();
 
-      if( pre_bp_block_out == CYCLE_PREBP_BLOCK || ( force_change && schedule_version != 0 ) ) {
+      if( pre_bp_block_out >= CYCLE_PREBP_BLOCK || ( force_change && schedule_version != 0 ) ) {
          reward_table reward_inf( _self, _self );
          auto reward = reward_inf.find( REWARD_ID );
          if( reward == reward_inf.end() ) {
@@ -318,7 +318,7 @@ namespace eosiosystem {
             b.block_age +=  (sch->producers[i].amount >= b.last_block_amount ? sch->producers[i].amount - b.last_block_amount : sch->producers[i].amount) * b.block_weight;
             total_block_out_age += (sch->producers[i].amount >= b.last_block_amount ? sch->producers[i].amount - b.last_block_amount : sch->producers[i].amount) * b.block_weight;
                
-            if(drain_block_num != 0) {
+            if(drain_block_num > 0) {
                b.block_weight = BLOCK_OUT_WEIGHT;
                b.mortgage -= asset(reward_pre_block * 2 * drain_block_num,CORE_SYMBOL);
                b.remain_punish += asset(reward_pre_block * 2 * drain_block_num,CORE_SYMBOL);
@@ -330,7 +330,7 @@ namespace eosiosystem {
          });
 
          auto drainbp = drain_bp_tbl.find(sch->producers[i].bpname);
-         if (drain_block_num != 0) {
+         if (drain_block_num > 0) {
             if (drainbp == drain_bp_tbl.end()) {
                drain_bp_tbl.emplace(_self, [&]( last_drain_block& s ) {
                   s.bpname = sch->producers[i].bpname;
