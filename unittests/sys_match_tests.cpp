@@ -22,8 +22,8 @@ using namespace eosio::testing;
 struct sys_match : public TESTER {
    
 public:
-   sys_match() : sys_match_acc("sys.match"), exc_acc("codex.bpa"), buyer("buyer"), 
-      seller("seller"), escrow("sys.match"), rel_token_acc("relay.token"),
+   sys_match() : sys_match_acc(config::match_account_name), exc_acc("codex.bpa"), buyer("buyer"), 
+      seller("seller"), escrow("sys.match"), rel_token_acc(config::relay_token_account_name),
       pair1_base(4, "BTC"), pair1_quote(2, "USDT"), pair2_base(4, "BTCC"), pair2_quote(2, "USDTC") {
       produce_blocks(2);
       
