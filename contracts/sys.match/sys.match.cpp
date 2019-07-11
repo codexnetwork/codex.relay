@@ -557,6 +557,8 @@ namespace exchange {
       
       cumulated_refund_quote = to_asset(relay_token_acc, itr1->quote_chain, itr1->quote_sym, quantity) -
                                to_asset(relay_token_acc, itr1->quote_chain, itr1->quote_sym, quant_after_fee);
+      sub_balance(payer, cumulated_refund_quote);
+                               
       //print("\n---exchange::match_for_bid: quantity=", quantity, ", quant_after_fee=", quant_after_fee, ", cumulated_refund_quote=", cumulated_refund_quote, ", order_id=", order_id, "\n");
       //print("\n---exchange::match_for_bid: base=", itr1->base, ", base_chain=", itr1->base_sym,", base_sym=", itr1->base_sym, ", quote=", itr1->quote,", quote_chain=", itr1->quote_chain,", quote_sym=", itr1->quote_sym,"\n");
 
@@ -628,10 +630,9 @@ namespace exchange {
             deducted_fee_type = charge_fee(pair_id, payer, quant_after_fee, exc_acc, fee_type, buy_fee);
             if (deducted_fee_type == 1)
                quant_after_fee -= buy_fee;
-            //quant_after_fee -= charge_fee(pair_id, payer, quant_after_fee, exc_acc, fee_type);
             cumulated_base += quant_after_fee;
-            if (full_match)
-               inline_transfer(escrow, receiver, itr1->base_chain, cumulated_base, "");
+            /*if (full_match)
+               inline_transfer(escrow, receiver, itr1->base_chain, cumulated_base, "");*/
         
             if (itr->price.symbol.precision() >= deal_base.symbol.precision())
                quant_after_fee = itr->price * deal_base.amount / precision(deal_base.symbol.precision());
@@ -643,7 +644,6 @@ namespace exchange {
             deducted_fee_type = charge_fee(pair_id, itr->maker, quant_after_fee, itr->exc_acc, itr->fee_type, sell_fee);
             if (deducted_fee_type == 1)
                quant_after_fee -= sell_fee;
-            //quant_after_fee -= charge_fee(pair_id, itr->maker, quant_after_fee, itr->exc_acc, itr->fee_type);
             inline_transfer(escrow, itr->receiver, itr1->quote_chain, quant_after_fee, "");
 
             quant_after_fee = to_asset(relay_token_acc, itr1->base_chain, itr1->base_sym, deal_base);
@@ -657,16 +657,15 @@ namespace exchange {
                   quant_after_fee = diff * deal_base.amount / precision(deal_base.symbol.precision());
                else
                   quant_after_fee = deal_base * diff.amount / precision(diff.symbol.precision());
-               //print("\n bid step1: quant_after_fee=",quant_after_fee);
                quant_after_fee = to_asset(relay_token_acc, itr1->quote_chain, itr1->quote_sym, quant_after_fee);
                sub_balance(payer, quant_after_fee);
-               //print("\n bid step2: quant_after_fee=",quant_after_fee);
                cumulated_refund_quote += quant_after_fee;
-               if (full_match)
-                  inline_transfer(escrow, payer, itr1->quote_chain, cumulated_refund_quote, "");
-            } else if (cumulated_refund_quote.amount > 0)
-               send_cumulated();
+               /*if (full_match)
+                  inline_transfer(escrow, payer, itr1->quote_chain, cumulated_refund_quote, "");*/
+            }/* else if (cumulated_refund_quote.amount > 0)
+               send_cumulated();*/
             if (full_match) {
+               send_cumulated();
                if (base < itr->base) {
                   idx_orderbook.modify(itr, _self, [&]( auto& o ) {
                      o.base -= deal_base;
@@ -686,7 +685,6 @@ namespace exchange {
          }
       };
       
-      //auto lower_key = (uint128_t(itr1->id) << 96) | ((uint128_t)(bid_or_ask ? 0 : 1)) << 64 | std::numeric_limits<uint64_t>::lowest();
       auto lower_key = compute_orderbook_lookupkey(itr1->id, bid_or_ask, std::numeric_limits<uint64_t>::lowest());    
       auto lower = idx_orderbook.lower_bound( lower_key );
       auto upper = idx_orderbook.upper_bound( lookup_key );
@@ -803,10 +801,9 @@ namespace exchange {
             deducted_fee_type = charge_fee(pair_id, payer, quant_after_fee, exc_acc, fee_type, sell_fee);
             if (deducted_fee_type == 1)
                quant_after_fee -= sell_fee;
-            //quant_after_fee -= charge_fee(pair_id, payer, quant_after_fee, exc_acc, fee_type);
             cumulated_quote += quant_after_fee;
-            if (full_match) 
-               inline_transfer(escrow, receiver, itr1->quote_chain, cumulated_quote, "");
+            /*if (full_match) 
+               inline_transfer(escrow, receiver, itr1->quote_chain, cumulated_quote, "");*/
                
             quant_after_fee = to_asset(relay_token_acc, itr1->base_chain, itr1->base_sym, deal_base);
             sub_balance(payer, quant_after_fee);
@@ -815,7 +812,6 @@ namespace exchange {
             //print("match_for_ask: step1: quant_after_fee=",quant_after_fee, ", deducted_fee_type=",deducted_fee_type, ", deducted_fee_type=",deducted_fee_type,);
             if (deducted_fee_type == 1)
                quant_after_fee -= buy_fee;
-            //quant_after_fee -= charge_fee(pair_id, end_itr->maker, quant_after_fee, end_itr->exc_acc, end_itr->fee_type);
             inline_transfer(escrow, end_itr->receiver, itr1->base_chain, quant_after_fee, "");
 
             auto converted_price = to_asset(relay_token_acc, itr1->quote_chain, itr1->quote_sym, end_itr->price);
@@ -837,6 +833,7 @@ namespace exchange {
                sub_balance(end_itr->maker, quant_after_fee);
             }*/
             if (full_match) {
+               send_cumulated();
                if( deal_base < end_itr->base ) {
                   idx_orderbook.modify(end_itr, _self, [&]( auto& o ) {
                      o.base -= deal_base;
