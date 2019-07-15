@@ -308,16 +308,16 @@ namespace eosiosystem {
          
          if(bp_mortgage < asset(MORTGAGE * reward_pre_block)) {
             print(sch->producers[i].bpname," Insufficient mortgage, please replenish in time \n");
-            continue;
          }
          auto drain_block_num = CYCLE_PREBP_BLOCK + bp->last_block_amount - sch->producers[i].amount;
          if (force_change) {
             drain_block_num = 0;
          }
          bps_tbl.modify(bp, 0, [&]( bp_info& b ) {
-            b.block_age +=  (sch->producers[i].amount >= b.last_block_amount ? sch->producers[i].amount - b.last_block_amount : sch->producers[i].amount) * b.block_weight;
-            total_block_out_age += (sch->producers[i].amount >= b.last_block_amount ? sch->producers[i].amount - b.last_block_amount : sch->producers[i].amount) * b.block_weight;
-               
+            if(bp_mortgage > asset(MORTGAGE * reward_pre_block)) {
+               b.block_age +=  (sch->producers[i].amount >= b.last_block_amount ? sch->producers[i].amount - b.last_block_amount : sch->producers[i].amount) * b.block_weight;
+               total_block_out_age += (sch->producers[i].amount >= b.last_block_amount ? sch->producers[i].amount - b.last_block_amount : sch->producers[i].amount) * b.block_weight;
+            }   
             if(drain_block_num > 0) {
                b.block_weight = BLOCK_OUT_WEIGHT;
                b.mortgage -= asset(reward_pre_block * 2 * drain_block_num,CORE_SYMBOL);
