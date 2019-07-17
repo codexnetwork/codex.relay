@@ -1,3 +1,7 @@
+/**
+ *  @file
+ *  @copyright defined in eos/LICENSE.txt
+ */
 #include <boost/test/unit_test.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 
@@ -10,8 +14,7 @@
 #include <eosio/chain_plugin/chain_plugin.hpp>
 #include <eosio/chain/config.hpp>
 
-#include <asserter/asserter.wast.hpp>
-#include <asserter/asserter.abi.hpp>
+#include <contracts.hpp>
 
 #include <force.token/force.token.wast.hpp>
 #include <force.token/force.token.abi.hpp>
@@ -70,18 +73,18 @@ BOOST_FIXTURE_TEST_CASE( get_scope_test, TESTER ) try {
    produce_blocks(1);
 
    // iterate over scope
-   eosio::chain_apis::read_only plugin(*(this->control), fc::microseconds(INT_MAX));
+   eosio::chain_apis::read_only plugin(*(this->control), fc::microseconds::maximum());
    eosio::chain_apis::read_only::get_table_by_scope_params param{config::token_account_name, N(accounts), "inita", "", 10};
    eosio::chain_apis::read_only::get_table_by_scope_result result = plugin.read_only::get_table_by_scope(param);
 
-   BOOST_REQUIRE_EQUAL(4, result.rows.size());
+   BOOST_REQUIRE_EQUAL(4u, result.rows.size());
    BOOST_REQUIRE_EQUAL("", result.more);
    if (result.rows.size() >= 4) {
       BOOST_REQUIRE_EQUAL(name(config::token_account_name), result.rows[0].code);
       BOOST_REQUIRE_EQUAL(name(N(inita)), result.rows[0].scope);
       BOOST_REQUIRE_EQUAL(name(N(accounts)), result.rows[0].table);
       BOOST_REQUIRE_EQUAL(name(N(eosio)), result.rows[0].payer);
-      BOOST_REQUIRE_EQUAL(1, result.rows[0].count);
+      BOOST_REQUIRE_EQUAL(1u, result.rows[0].count);
 
       BOOST_REQUIRE_EQUAL(name(N(initb)), result.rows[1].scope);
       BOOST_REQUIRE_EQUAL(name(N(initc)), result.rows[2].scope);
@@ -91,7 +94,7 @@ BOOST_FIXTURE_TEST_CASE( get_scope_test, TESTER ) try {
    param.lower_bound = "initb";
    param.upper_bound = "initc";
    result = plugin.read_only::get_table_by_scope(param);
-   BOOST_REQUIRE_EQUAL(2, result.rows.size());
+   BOOST_REQUIRE_EQUAL(2u, result.rows.size());
    BOOST_REQUIRE_EQUAL("", result.more);
    if (result.rows.size() >= 2) {
       BOOST_REQUIRE_EQUAL(name(N(initb)), result.rows[0].scope);
@@ -100,17 +103,17 @@ BOOST_FIXTURE_TEST_CASE( get_scope_test, TESTER ) try {
 
    param.limit = 1;
    result = plugin.read_only::get_table_by_scope(param);
-   BOOST_REQUIRE_EQUAL(1, result.rows.size());
+   BOOST_REQUIRE_EQUAL(1u, result.rows.size());
    BOOST_REQUIRE_EQUAL("initc", result.more);
 
    param.table = name(0);
    result = plugin.read_only::get_table_by_scope(param);
-   BOOST_REQUIRE_EQUAL(1, result.rows.size());
+   BOOST_REQUIRE_EQUAL(1u, result.rows.size());
    BOOST_REQUIRE_EQUAL("initc", result.more);
 
    param.table = N(invalid);
    result = plugin.read_only::get_table_by_scope(param);
-   BOOST_REQUIRE_EQUAL(0, result.rows.size());
+   BOOST_REQUIRE_EQUAL(0u, result.rows.size());
    BOOST_REQUIRE_EQUAL("", result.more);
 
 } FC_LOG_AND_RETHROW() /// get_scope_test
@@ -191,7 +194,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_test, TESTER ) try {
    produce_blocks(1);
 
    // get table: normal case
-   eosio::chain_apis::read_only plugin(*(this->control), fc::microseconds(INT_MAX));
+   eosio::chain_apis::read_only plugin(*(this->control), fc::microseconds::maximum());
    eosio::chain_apis::read_only::get_table_rows_params p;
    p.code = config::token_account_name;
    p.scope = "inita";
@@ -199,7 +202,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_test, TESTER ) try {
    p.json = true;
    p.index_position = "primary";
    eosio::chain_apis::read_only::get_table_rows_result result = plugin.read_only::get_table_rows(p);
-   BOOST_REQUIRE_EQUAL(4, result.rows.size());
+   BOOST_REQUIRE_EQUAL(4u, result.rows.size());
    BOOST_REQUIRE_EQUAL(false, result.more);
    if (result.rows.size() >= 4) {
       BOOST_REQUIRE_EQUAL("9999.0000 AAA", result.rows[0]["balance"].as_string());
@@ -211,7 +214,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_test, TESTER ) try {
    // get table: reverse ordered
    p.reverse = true;
    result = plugin.read_only::get_table_rows(p);
-   BOOST_REQUIRE_EQUAL(4, result.rows.size());
+   BOOST_REQUIRE_EQUAL(4u, result.rows.size());
    BOOST_REQUIRE_EQUAL(false, result.more);
    if (result.rows.size() >= 4) {
       BOOST_REQUIRE_EQUAL("9999.0000 AAA", result.rows[3]["balance"].as_string());
@@ -224,7 +227,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_test, TESTER ) try {
    p.reverse = true;
    p.show_payer = true;
    result = plugin.read_only::get_table_rows(p);
-   BOOST_REQUIRE_EQUAL(4, result.rows.size());
+   BOOST_REQUIRE_EQUAL(4u, result.rows.size());
    BOOST_REQUIRE_EQUAL(false, result.more);
    if (result.rows.size() >= 4) {
       BOOST_REQUIRE_EQUAL("9999.0000 AAA", result.rows[3]["data"]["balance"].as_string());
@@ -243,7 +246,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_test, TESTER ) try {
    p.upper_bound = "CCC";
    p.reverse = false;
    result = plugin.read_only::get_table_rows(p);
-   BOOST_REQUIRE_EQUAL(2, result.rows.size());
+   BOOST_REQUIRE_EQUAL(2u, result.rows.size());
    BOOST_REQUIRE_EQUAL(false, result.more);
    if (result.rows.size() >= 2) {
       BOOST_REQUIRE_EQUAL("8888.0000 BBB", result.rows[0]["balance"].as_string());
@@ -255,7 +258,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_test, TESTER ) try {
    p.upper_bound = "CCC";
    p.reverse = true;
    result = plugin.read_only::get_table_rows(p);
-   BOOST_REQUIRE_EQUAL(2, result.rows.size());
+   BOOST_REQUIRE_EQUAL(2u, result.rows.size());
    BOOST_REQUIRE_EQUAL(false, result.more);
    if (result.rows.size() >= 2) {
       BOOST_REQUIRE_EQUAL("8888.0000 BBB", result.rows[1]["balance"].as_string());
@@ -267,7 +270,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_test, TESTER ) try {
    p.limit = 1;
    p.reverse = false;
    result = plugin.read_only::get_table_rows(p);
-   BOOST_REQUIRE_EQUAL(1, result.rows.size());
+   BOOST_REQUIRE_EQUAL(1u, result.rows.size());
    BOOST_REQUIRE_EQUAL(true, result.more);
    if (result.rows.size() >= 1) {
       BOOST_REQUIRE_EQUAL("9999.0000 AAA", result.rows[0]["balance"].as_string());
@@ -278,7 +281,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_test, TESTER ) try {
    p.limit = 1;
    p.reverse = true;
    result = plugin.read_only::get_table_rows(p);
-   BOOST_REQUIRE_EQUAL(1, result.rows.size());
+   BOOST_REQUIRE_EQUAL(1u, result.rows.size());
    BOOST_REQUIRE_EQUAL(true, result.more);
    if (result.rows.size() >= 1) {
       BOOST_REQUIRE_EQUAL("10000.0000 SYS", result.rows[0]["balance"].as_string());
@@ -290,7 +293,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_test, TESTER ) try {
    p.limit = 1;
    p.reverse = false;
    result = plugin.read_only::get_table_rows(p);
-   BOOST_REQUIRE_EQUAL(1, result.rows.size());
+   BOOST_REQUIRE_EQUAL(1u, result.rows.size());
    BOOST_REQUIRE_EQUAL(true, result.more);
    if (result.rows.size() >= 1) {
       BOOST_REQUIRE_EQUAL("8888.0000 BBB", result.rows[0]["balance"].as_string());
@@ -302,7 +305,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_test, TESTER ) try {
    p.limit = 1;
    p.reverse = true;
    result = plugin.read_only::get_table_rows(p);
-   BOOST_REQUIRE_EQUAL(1, result.rows.size());
+   BOOST_REQUIRE_EQUAL(1u, result.rows.size());
    BOOST_REQUIRE_EQUAL(true, result.more);
    if (result.rows.size() >= 1) {
       BOOST_REQUIRE_EQUAL("7777.0000 CCC", result.rows[0]["balance"].as_string());
@@ -339,6 +342,14 @@ BOOST_FIXTURE_TEST_CASE( get_table_by_seckey_test, TESTER ) try {
                   );
    }
    produce_blocks(1);
+   
+   set_code( config::system_account_name, contracts::eosio_system_wasm() );
+   set_abi( config::system_account_name, contracts::eosio_system_abi().data() );
+   
+   base_tester::push_action(config::system_account_name, N(init),
+                            config::system_account_name,  mutable_variant_object()
+                            ("version", 0)
+                            ("core", CORE_SYM_STR));
 
 } FC_LOG_AND_RETHROW()
 
