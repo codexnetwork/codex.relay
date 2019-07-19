@@ -86,8 +86,8 @@ mkdir -p $ETC_LOCATION
 mkdir -p $MONGODB_LOG_LOCATION
 mkdir -p $MONGODB_DATA_LOCATION
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-REPO_ROOT="${SCRIPT_DIR}/.."
+#SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+REPO_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BUILD_DIR="${REPO_ROOT}/build"
 
 # Use current directory's tmp directory if noexec is enabled for /tmp
@@ -292,26 +292,19 @@ cd $REPO_ROOT
 
 TIME_END=$(( $(date -u +%s) - $TIME_BEGIN ))
 
-printf "${bldred}\n\n _______  _______  _______ _________ _______\n"
-printf '(  ____ \(  ___  )(  ____ \\\\__   __/(  ___  )\n'
-printf "| (    \/| (   ) || (    \/   ) (   | (   ) |\n"
-printf "| (__    | |   | || (_____    | |   | |   | |\n"
-printf "|  __)   | |   | |(_____  )   | |   | |   | |\n"
-printf "| (      | |   | |      ) |   | |   | |   | |\n"
-printf "| (____/\| (___) |/\____) |___) (___| (___) |\n"
-printf "(_______/(_______)\_______)\_______/(_______)\n\n${txtrst}"
+printf "\n\n${bldred}\t   __________  ____  _______  __   ________   \n"
+printf "\t  / ____/ __ \/ __ \/ ____/ |/ /  /  _/ __ \  \n"
+printf "\t / /   / / / / / / / __/  |   /   / // / / /  \n"
+printf "\t/ /___/ /_/ / /_/ / /___ /   |_ _/ // /_/ /   \n"
+printf "\t\____/\____/_____/_____//_/|_(_)___/\____/    \n"
+printf "\t                                              \n${txtrst}"
 
-printf "\\nEOSIO has been successfully built. %02d:%02d:%02d\\n" $(($TIME_END/3600)) $(($TIME_END%3600/60)) $(($TIME_END%60))
-printf "==============================================================================================\\n${bldred}"
-printf "(Optional) Testing Instructions:\\n"
-print_instructions
-printf "${BIN_LOCATION}/mongod --dbpath ${MONGODB_DATA_LOCATION} -f ${MONGODB_CONF} --logpath ${MONGODB_LOG_LOCATION}/mongod.log &\\n"
-printf "cd ./build && PATH=\$PATH:$HOME/opt/mongodb/bin make test\\n" # PATH is set as currently 'mongo' binary is required for the mongodb test
-printf "${txtrst}==============================================================================================\\n"
-printf "For more information:\\n"
-printf "EOSIO website: https://eos.io\\n"
-printf "EOSIO Telegram channel @ https://t.me/EOSProject\\n"
-printf "EOSIO resources: https://eos.io/resources/\\n"
-printf "EOSIO Stack Exchange: https://eosio.stackexchange.com\\n"
-printf "EOSIO wiki: https://github.com/EOSIO/eos/wiki\\n\\n\\n"
+printf "\\n\\tCodex.IO has been successfully built. %02d:%02d:%02d\\n\\n" $(($TIME_END/3600)) $(($TIME_END%3600/60)) $(($TIME_END%60))
+#printf "\\tTo verify your installation run the following commands:\\n"
+
+#print_instructions
+
+printf "\\tFor more information:\\n"
+printf "\\tCodex.IO website: https://open.eosforce.io/\#/en \\n"
+printf "\\tCodex.IO Telegram channel @ https://t.me/forceio \\n"
 
