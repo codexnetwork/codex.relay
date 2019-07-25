@@ -31,7 +31,6 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install openssl 
 COPY --from=builder /usr/local/lib/* /usr/local/lib/
 COPY --from=builder /tmp/build/bin /opt/FORCEIO/bin
 COPY nodeosd.sh /opt/FORCEIO/bin/nodeosd.sh
-COPY --from=builder /tmp/build/contracts /contracts
 COPY config.ini /
 COPY genesis.json /opt/
 COPY activeacc.json /opt/
