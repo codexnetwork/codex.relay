@@ -7,7 +7,6 @@
 #include <fc/io/json.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/tuple/tuple_io.hpp>
-#include <eosio/chain/wast_to_wasm.hpp>
 
 #include <iosfwd>
 
@@ -436,41 +435,73 @@ namespace eosio { namespace testing {
          	
          // load system contract
      	{
-#include <force.system/force.system.wast.hpp>
-#include <force.system/force.system.abi.hpp>
-#include <force.token/force.token.wast.hpp>
-#include <force.token/force.token.abi.hpp>
-#include <force.msig/force.msig.wast.hpp>
-#include <force.msig/force.msig.abi.hpp>
-#include <force.relay/force.relay.wast.hpp>
-#include <force.relay/force.relay.abi.hpp>
+//#include <force.system/force.system.wast.hpp>
+//#include <force.system/force.system.abi.hpp>
+//#include <force.token/force.token.wast.hpp>
+//#include <force.token/force.token.abi.hpp>
+//#include <force.msig/force.msig.wast.hpp>
+//#include <force.msig/force.msig.abi.hpp>
+//#include <force.relay/force.relay.wast.hpp>
+//#include <force.relay/force.relay.abi.hpp>
 
          std::vector<uint8_t> wasm;
          abi_def abi;
-         		
-         wasm = wast_to_wasm(force_system_wast);
+         	
+         //wasm = wast_to_wasm(force_system_wast);
+         //vcfg.system.code.assign(wasm.begin(), wasm.end());
+         //abi  = fc::json::from_string(force_system_abi).as<abi_def>();
+         //vcfg.system.abi = fc::raw::pack(abi);
+         //vcfg.system.name = config::system_account_name;
+         //
+         //wasm = wast_to_wasm(force_token_wast);
+         //vcfg.token.code.assign(wasm.begin(), wasm.end());
+         //abi  = fc::json::from_string(force_token_abi).as<abi_def>();
+         //vcfg.token.abi = fc::raw::pack(abi);
+         //vcfg.token.name = config::token_account_name;
+         //
+         //wasm = wast_to_wasm(force_msig_wast);
+         //vcfg.msig.code.assign(wasm.begin(), wasm.end());
+         //abi  = fc::json::from_string(force_msig_abi).as<abi_def>();
+         //vcfg.msig.abi = fc::raw::pack(abi);
+         //vcfg.msig.name = config::msig_account_name;
+         //   
+         //wasm = wast_to_wasm(force_relay_wast);
+         //vcfg.relay.code.assign(wasm.begin(), wasm.end());
+         //abi  = fc::json::from_string(force_relay_abi).as<abi_def>();
+         //vcfg.relay.abi = fc::raw::pack(abi);
+         //vcfg.relay.name = config::relay_account_name;
+         
+         struct contracts11 {
+// CN -> contract C++ name, C -> contract name, D -> top level directory
+#define MAKE_READ_WASM_ABI11(CN,C, D) \
+   static std::vector<uint8_t> CN ## _wasm() { return read_wasm("${CMAKE_BINARY_DIR}/unittests/" #D "/" #C "/" #C ".wasm"); } \
+   static std::vector<char> CN ## _abi() { return read_abi("${CMAKE_BINARY_DIR}/unittests/" #D "/" #C "/" #C ".abi"); }
+         
+            MAKE_READ_WASM_ABI11(force_system,   force.system, contracts)
+            MAKE_READ_WASM_ABI11(force_token,   force.force_token, contracts)
+            MAKE_READ_WASM_ABI11(force_msig, force.msig, contracts)
+            MAKE_READ_WASM_ABI11(force_relay,  force.force_relay,  contracts)
+         };
+         
+         wasm = contracts11::force_system_wasm();
          vcfg.system.code.assign(wasm.begin(), wasm.end());
-         abi  = fc::json::from_string(force_system_abi).as<abi_def>();
-         vcfg.system.abi = fc::raw::pack(abi);
-         vcfg.system.name = config::system_account_name;
+         vcfg.system.abi   = contracts11::force_system_abi();
+         vcfg.system.name  = config::system_account_name;
          
-         wasm = wast_to_wasm(force_token_wast);
+         wasm = contracts11::force_token_wasm();
          vcfg.token.code.assign(wasm.begin(), wasm.end());
-         abi  = fc::json::from_string(force_token_abi).as<abi_def>();
-         vcfg.token.abi = fc::raw::pack(abi);
-         vcfg.token.name = config::token_account_name;
+         vcfg.token.abi    = contracts11::force_token_abi();
+         vcfg.token.name   = config::token_account_name;
          
-         wasm = wast_to_wasm(force_msig_wast);
+         wasm = contracts11::force_msig_wasm();
          vcfg.msig.code.assign(wasm.begin(), wasm.end());
-         abi  = fc::json::from_string(force_msig_abi).as<abi_def>();
-         vcfg.msig.abi = fc::raw::pack(abi);
-         vcfg.msig.name = config::msig_account_name;
-            
-         wasm = wast_to_wasm(force_relay_wast);
-         vcfg.relay.code.assign(wasm.begin(), wasm.end());
-         abi  = fc::json::from_string(force_relay_abi).as<abi_def>();
-         vcfg.relay.abi = fc::raw::pack(abi);
-         vcfg.relay.name = config::relay_account_name;
+         vcfg.msig.abi     = contracts11::force_msig_abi();
+         vcfg.msig.name    = config::msig_account_name;
+         
+         wasm = contracts11::force_relay_wasm();   
+         vcfg.relay.code.assign(wasm.begin(), wasm.end());   
+         vcfg.relay.abi    = contracts11::force_relay_abi();
+         vcfg.relay.name   = config::relay_account_name;
 		}
 		
          for(int i = 0; i < boost::unit_test::framework::master_test_suite().argc; ++i) {

@@ -3,10 +3,11 @@
 #include <eosio/chain/producer_object.hpp>
 #include <eosio/chain/global_property_object.hpp>
 #include <eosio/chain/generated_transaction_object.hpp>
-#include <relay.token/relay.token.wast.hpp>
-#include <relay.token/relay.token.abi.hpp>
-#include <sys.match/sys.match.wast.hpp>
-#include <sys.match/sys.match.abi.hpp>
+#include <contracts.hpp>
+//#include <relay.token/relay.token.wast.hpp>
+//#include <relay.token/relay.token.abi.hpp>
+//#include <sys.match/sys.match.wast.hpp>
+//#include <sys.match/sys.match.abi.hpp>
 
 
 #ifdef NON_VALIDATING_TEST
@@ -22,8 +23,8 @@ using namespace eosio::testing;
 struct sys_match : public TESTER {
    
 public:
-   sys_match() : sys_match_acc("sys.match"), exc_acc("codex.bpa"), buyer("buyer"), 
-      seller("seller"), escrow("sys.match"), rel_token_acc("relay.token"),
+   sys_match() : sys_match_acc(config::match_account_name), exc_acc("codex.bpa"), buyer("buyer"), 
+      seller("seller"), escrow("sys.match"), rel_token_acc(config::relay_token_account_name),
       pair1_base(4, "BTC"), pair1_quote(2, "USDT"), pair2_base(4, "BTCC"), pair2_quote(2, "USDTC") {
       produce_blocks(2);
       
@@ -36,8 +37,8 @@ public:
          ("voter", rel_token_acc)
          ("bpname", "codex.bpa")
          ("stake", "10000.0000 SYS"));
-      set_code(rel_token_acc, relay_token_wast);
-      set_abi(rel_token_acc, relay_token_abi);
+      set_code(rel_token_acc, contracts::relay_token_wasm());
+      set_abi(rel_token_acc, contracts::relay_token_abi().data());
       
       // first, deploy sys.match contract on eosforce contract
       create_account(sys_match_acc);
@@ -48,8 +49,8 @@ public:
          ("voter", sys_match_acc)
          ("bpname", "codex.bpa")
          ("stake", "10000.0000 SYS"));
-      set_code(sys_match_acc, sys_match_wast);
-      set_abi(sys_match_acc, sys_match_abi);
+      set_code(sys_match_acc, contracts::sys_match_wasm());
+      set_abi(sys_match_acc, contracts::sys_match_abi().data());
       
       // second, setfee
       set_fee(sys_match_acc, N(create), asset(100), 100000, 1000000, 1000);

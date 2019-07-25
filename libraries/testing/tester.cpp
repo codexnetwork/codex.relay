@@ -165,41 +165,61 @@ namespace eosio { namespace testing {
 
 // load system contract
      	{
-#include <force.system/force.system.wast.hpp>
-#include <force.system/force.system.abi.hpp>
-#include <force.token/force.token.wast.hpp>
-#include <force.token/force.token.abi.hpp>
-#include <force.msig/force.msig.wast.hpp>
-#include <force.msig/force.msig.abi.hpp>
-#include <force.relay/force.relay.wast.hpp>
-#include <force.relay/force.relay.abi.hpp>
+//#include <force.system/force.system.wast.hpp>
+//#include <force.system/force.system.abi.hpp>
+//#include <force.token/force.token.wast.hpp>
+//#include <force.token/force.token.abi.hpp>
+//#include <force.msig/force.msig.wast.hpp>
+//#include <force.msig/force.msig.abi.hpp>
+//#include <force.relay/force.relay.wast.hpp>
+//#include <force.relay/force.relay.abi.hpp>
 
          std::vector<uint8_t> wasm;
          abi_def abi;
          		
-         wasm = wast_to_wasm(force_system_wast);
+         //wasm = wast_to_wasm(force_system_wast);
+         //cfg.system.code.assign(wasm.begin(), wasm.end());
+         //abi = fc::json::from_string(force_system_abi).as<abi_def>();
+         //cfg.system.abi = fc::raw::pack(abi);
+         //cfg.system.name = config::system_account_name;
+         //
+         //wasm = wast_to_wasm(force_token_wast);
+         //cfg.token.code.assign(wasm.begin(), wasm.end());
+         //abi  = fc::json::from_string(force_token_abi).as<abi_def>();
+         //cfg.token.abi = fc::raw::pack(abi);
+         //cfg.token.name = config::token_account_name;
+         //
+         //wasm = wast_to_wasm(force_msig_wast);
+         //cfg.msig.code.assign(wasm.begin(), wasm.end());
+         //abi  = fc::json::from_string(force_msig_abi).as<abi_def>();
+         //cfg.msig.abi = fc::raw::pack(abi);
+         //cfg.msig.name = config::msig_account_name;
+         //   
+         //wasm = wast_to_wasm(force_relay_wast);
+         //cfg.relay.code.assign(wasm.begin(), wasm.end());
+         //abi  = fc::json::from_string(force_relay_abi).as<abi_def>();
+         //cfg.relay.abi = fc::raw::pack(abi);
+         //cfg.relay.name = config::relay_account_name;
+         
+         wasm = contracts::eosio_system_wasm();
          cfg.system.code.assign(wasm.begin(), wasm.end());
-         abi = fc::json::from_string(force_system_abi).as<abi_def>();
-         cfg.system.abi = fc::raw::pack(abi);
-         cfg.system.name = config::system_account_name;
+         cfg.system.abi   = contracts::eosio_system_abi();
+         cfg.system.name  = config::system_account_name;
          
-         wasm = wast_to_wasm(force_token_wast);
+         wasm = contracts::eosio_token_wasm();
          cfg.token.code.assign(wasm.begin(), wasm.end());
-         abi  = fc::json::from_string(force_token_abi).as<abi_def>();
-         cfg.token.abi = fc::raw::pack(abi);
-         cfg.token.name = config::token_account_name;
+         cfg.token.abi    = contracts::eosio_token_abi();
+         cfg.token.name   = config::token_account_name;
          
-         wasm = wast_to_wasm(force_msig_wast);
+         wasm = contracts::eosio_msig_wasm();
          cfg.msig.code.assign(wasm.begin(), wasm.end());
-         abi  = fc::json::from_string(force_msig_abi).as<abi_def>();
-         cfg.msig.abi = fc::raw::pack(abi);
-         cfg.msig.name = config::msig_account_name;
-            
-         wasm = wast_to_wasm(force_relay_wast);
-         cfg.relay.code.assign(wasm.begin(), wasm.end());
-         abi  = fc::json::from_string(force_relay_abi).as<abi_def>();
-         cfg.relay.abi = fc::raw::pack(abi);
-         cfg.relay.name = config::relay_account_name;
+         cfg.msig.abi     = contracts::eosio_msig_abi();
+         cfg.msig.name    = config::msig_account_name;
+         
+         wasm = contracts::force_relay_wasm();   
+         cfg.relay.code.assign(wasm.begin(), wasm.end());   
+         cfg.relay.abi    = contracts::force_relay_abi();
+         cfg.relay.name   = config::relay_account_name;
 		}
 
       open(nullptr);
