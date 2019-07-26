@@ -51,7 +51,7 @@ target_include_directories( unit_test PUBLIC
                             ${CMAKE_CURRENT_SOURCE_DIR}/contracts
                             ${CMAKE_CURRENT_BINARY_DIR}/contracts
                             ${CMAKE_CURRENT_BINARY_DIR}/include )
-add_dependencies(unit_test asserter test_api test_api_mem test_api_db test_ram_limit test_api_multi_index force.token proxy identity identity_test stltest force.token multi_index_test noop payloadless tic_tac_toe snapshot_test sys.match)
+#add_dependencies(unit_test asserter test_api test_api_mem test_api_db test_ram_limit test_api_multi_index force.token proxy identity identity_test stltest force.token multi_index_test noop payloadless tic_tac_toe snapshot_test sys.match)
 
 ### MARK TEST SUITES FOR EXECUTION ###
 foreach(TEST_SUITE ${UNIT_TESTS}) # create an independent target for each test suite

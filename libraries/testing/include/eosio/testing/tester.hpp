@@ -372,7 +372,7 @@ namespace eosio { namespace testing {
    		 const char* genesis_string = R"=====(
 {
   "initial_timestamp": "2018-05-28T12:00:00.000",
-  "initial_key": "FOSC7LmC1HJWkHNd1uJ5cBa24vZyEi1HdB4U7DncPkfqNVNfVMCR64",
+  "initial_key": "EOSC7LmC1HJWkHNd1uJ5cBa24vZyEi1HdB4U7DncPkfqNVNfVMCR64",
   "code": "",
   "abi": "",
   "token_code": "",
@@ -397,26 +397,26 @@ namespace eosio { namespace testing {
     "max_authority_depth": 6
   },
   "initial_account_list": [{
-      "key": "FOSC7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
+      "key": "EOSC7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
       "asset": "1000000000.0000 SYS",
       "name": "eosforce"
     },{
-      "key": "FOSC7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
+      "key": "EOSC7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
       "asset": "1000000.0000 SYS",
       "name": "b1"
     },{
-      "key": "FOSC7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
+      "key": "EOSC7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
       "asset": "1000000.0000 SYS",
       "name": "force.test"
     },{
-      "key": "FOSC7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
+      "key": "EOSC7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
       "asset": "1000000.0000 SYS",
       "name": "force.config"
     }
   ],
   "initial_producer_list": [{
       "name": "codex.bpa",
-      "bpkey": "FOSC7LmC1HJWkHNd1uJ5cBa24vZyEi1HdB4U7DncPkfqNVNfVMCR64",
+      "bpkey": "EOSC7LmC1HJWkHNd1uJ5cBa24vZyEi1HdB4U7DncPkfqNVNfVMCR64",
       "commission_rate": 10,
       "url": ""
     }
