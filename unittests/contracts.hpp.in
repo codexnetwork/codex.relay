@@ -35,6 +35,7 @@ namespace eosio {
          MAKE_READ_WASM_ABI(eosio_token,  force.token,  contracts)
          MAKE_READ_WASM_ABI(relay_token,  relay.token,  contracts)
          MAKE_READ_WASM_ABI(force_relay,  force.relay,  contracts)
+         MAKE_READ_WASM_ABI(sys_match,    sys.match,    contracts)
 
          // Contracts in `eos/unittests/unittests/test-contracts' directory
          MAKE_READ_WASM_ABI(asserter,             asserter,             test-contracts)
@@ -47,7 +48,7 @@ namespace eosio {
          MAKE_READ_WASM_ABI(test_api_db,          test_api_db,          test-contracts)
          MAKE_READ_WASM_ABI(test_api_multi_index, test_api_multi_index, test-contracts)
          MAKE_READ_WASM_ABI(test_ram_limit,       test_ram_limit,       test-contracts)
-         MAKE_READ_WASM_ABI(sys_match,       sys.match,       test-contracts)
+         
       };
    } /// eosio::testing
 }  /// eosio
