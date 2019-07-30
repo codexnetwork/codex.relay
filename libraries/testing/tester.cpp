@@ -31,7 +31,7 @@ namespace eosio { namespace testing {
 
    std::vector<uint8_t> read_wasm( const char* fn ) {
       std::ifstream wasm_file(fn, std::ios::binary);
-      FC_ASSERT( wasm_file.is_open(), "wasm file cannot be found" );
+      FC_ASSERT( wasm_file.is_open(), "wasm file cannot be found");
       wasm_file.seekg(0, std::ios::end);
       std::vector<uint8_t> wasm;
       int len = wasm_file.tellg();
@@ -58,7 +58,7 @@ namespace eosio { namespace testing {
       return abi;
    }
 
-   const fc::microseconds base_tester::abi_serializer_max_time{1000*1000}; // 1s for slow test machines
+   const fc::microseconds base_tester::abi_serializer_max_time{10000000*1000*1000}; // 1s for slow test machines
 
    bool expect_assert_message(const fc::exception& ex, string expected) {
       BOOST_TEST_MESSAGE("LOG : " << "expected: " << expected << ", actual: " << ex.get_log().at(0).get_message());
@@ -96,7 +96,7 @@ namespace eosio { namespace testing {
    	  const char* genesis_string = R"=====(
 {
   "initial_timestamp": "2018-05-28T12:00:00.000",
-  "initial_key": "FOSC7LmC1HJWkHNd1uJ5cBa24vZyEi1HdB4U7DncPkfqNVNfVMCR64",
+  "initial_key": "EOS7LmC1HJWkHNd1uJ5cBa24vZyEi1HdB4U7DncPkfqNVNfVMCR64",
   "code": "",
   "abi": "",
   "token_code": "",
@@ -121,26 +121,26 @@ namespace eosio { namespace testing {
     "max_authority_depth": 6
   },
   "initial_account_list": [{
-      "key": "FOSC7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
-      "asset": "1000000000.0000 SYS",
+      "key": "EOS7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
+      "asset": "1000000000.0000 CDX",
       "name": "eosforce"
     },{
-      "key": "FOSC7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
-      "asset": "1000000.0000 SYS",
+      "key": "EOS7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
+      "asset": "1000000.0000 CDX",
       "name": "b1"
     },{
-      "key": "FOSC7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
-      "asset": "1000000.0000 SYS",
+      "key": "EOS7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
+      "asset": "1000000.0000 CDX",
       "name": "force.test"
     },{
-      "key": "FOSC7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
-      "asset": "1000000.0000 SYS",
-      "name": "force.config"
+      "key": "EOS7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
+      "asset": "1000000.0000 CDX",
+      "name": "codex.config"
     }
   ],
   "initial_producer_list": [{
       "name": "codex.bpa",
-      "bpkey": "FOSC7LmC1HJWkHNd1uJ5cBa24vZyEi1HdB4U7DncPkfqNVNfVMCR64",
+      "bpkey": "EOS7LmC1HJWkHNd1uJ5cBa24vZyEi1HdB4U7DncPkfqNVNfVMCR64",
       "commission_rate": 10,
       "url": ""
     }
@@ -151,7 +151,7 @@ namespace eosio { namespace testing {
 	  cfg.genesis = fc::json::from_string(genesis_string).as<genesis_state>();
 	  cfg.genesis.initial_account_list[0].key = get_public_key( N(eosforce), "active" );
 	  cfg.genesis.initial_account_list[2].key = get_public_key( N(force.test), "active" );
-	  cfg.genesis.initial_account_list[3].key = get_public_key( N(force.config), "active" );
+	  cfg.genesis.initial_account_list[3].key = get_public_key( N(codex.config), "active" );
 	  cfg.genesis.initial_producer_list[0].bpkey = get_public_key( N(codex.bpa), "active" );
 
       cfg.genesis.initial_key = get_public_key( config::system_account_name, "active" );
@@ -165,41 +165,65 @@ namespace eosio { namespace testing {
 
 // load system contract
      	{
-#include <force.system/force.system.wast.hpp>
-#include <force.system/force.system.abi.hpp>
-#include <force.token/force.token.wast.hpp>
-#include <force.token/force.token.abi.hpp>
-#include <force.msig/force.msig.wast.hpp>
-#include <force.msig/force.msig.abi.hpp>
-#include <force.relay/force.relay.wast.hpp>
-#include <force.relay/force.relay.abi.hpp>
+//#include <force.system/force.system.wast.hpp>
+//#include <force.system/force.system.abi.hpp>
+//#include <force.token/force.token.wast.hpp>
+//#include <force.token/force.token.abi.hpp>
+//#include <force.msig/force.msig.wast.hpp>
+//#include <force.msig/force.msig.abi.hpp>
+//#include <force.relay/force.relay.wast.hpp>
+//#include <force.relay/force.relay.abi.hpp>
 
          std::vector<uint8_t> wasm;
          abi_def abi;
          		
-         wasm = wast_to_wasm(force_system_wast);
+         //wasm = wast_to_wasm(force_system_wast);
+         //cfg.system.code.assign(wasm.begin(), wasm.end());
+         //abi = fc::json::from_string(force_system_abi).as<abi_def>();
+         //cfg.system.abi = fc::raw::pack(abi);
+         //cfg.system.name = config::system_account_name;
+         //
+         //wasm = wast_to_wasm(force_token_wast);
+         //cfg.token.code.assign(wasm.begin(), wasm.end());
+         //abi  = fc::json::from_string(force_token_abi).as<abi_def>();
+         //cfg.token.abi = fc::raw::pack(abi);
+         //cfg.token.name = config::token_account_name;
+         //
+         //wasm = wast_to_wasm(force_msig_wast);
+         //cfg.msig.code.assign(wasm.begin(), wasm.end());
+         //abi  = fc::json::from_string(force_msig_abi).as<abi_def>();
+         //cfg.msig.abi = fc::raw::pack(abi);
+         //cfg.msig.name = config::msig_account_name;
+         //   
+         //wasm = wast_to_wasm(force_relay_wast);
+         //cfg.relay.code.assign(wasm.begin(), wasm.end());
+         //abi  = fc::json::from_string(force_relay_abi).as<abi_def>();
+         //cfg.relay.abi = fc::raw::pack(abi);
+         //cfg.relay.name = config::relay_account_name;
+         
+         wasm = contracts::eosio_system_wasm();
          cfg.system.code.assign(wasm.begin(), wasm.end());
-         abi = fc::json::from_string(force_system_abi).as<abi_def>();
-         cfg.system.abi = fc::raw::pack(abi);
-         cfg.system.name = config::system_account_name;
+         abi = fc::json::from_string(contracts::eosio_system_abi().data()).as<abi_def>();
+         cfg.system.abi   = fc::raw::pack(abi);
+         cfg.system.name  = config::system_account_name;
          
-         wasm = wast_to_wasm(force_token_wast);
+         wasm = contracts::eosio_token_wasm();
          cfg.token.code.assign(wasm.begin(), wasm.end());
-         abi  = fc::json::from_string(force_token_abi).as<abi_def>();
-         cfg.token.abi = fc::raw::pack(abi);
-         cfg.token.name = config::token_account_name;
+         abi = fc::json::from_string(contracts::eosio_token_abi().data()).as<abi_def>();
+         cfg.token.abi    = fc::raw::pack(abi);
+         cfg.token.name   = config::token_account_name;
          
-         wasm = wast_to_wasm(force_msig_wast);
+         wasm = contracts::eosio_msig_wasm();
          cfg.msig.code.assign(wasm.begin(), wasm.end());
-         abi  = fc::json::from_string(force_msig_abi).as<abi_def>();
-         cfg.msig.abi = fc::raw::pack(abi);
-         cfg.msig.name = config::msig_account_name;
-            
-         wasm = wast_to_wasm(force_relay_wast);
+         abi = fc::json::from_string(contracts::eosio_msig_abi().data()).as<abi_def>();
+         cfg.msig.abi     = fc::raw::pack(abi);
+         cfg.msig.name    = config::msig_account_name;
+         
+         wasm = contracts::force_relay_wasm();   
          cfg.relay.code.assign(wasm.begin(), wasm.end());
-         abi  = fc::json::from_string(force_relay_abi).as<abi_def>();
-         cfg.relay.abi = fc::raw::pack(abi);
-         cfg.relay.name = config::relay_account_name;
+         abi = fc::json::from_string(contracts::force_relay_abi().data()).as<abi_def>();
+         cfg.relay.abi    = fc::raw::pack(abi);
+         cfg.relay.name   = config::relay_account_name;
 		}
 
       open(nullptr);
@@ -438,7 +462,11 @@ namespace eosio { namespace testing {
       trx.sign( get_private_key( creator, "active" ), control->get_chain_id()  );
       auto trace = push_transaction( trx );
       
-      transfer( N(eosforce), a, "100000.0000 SYS", "create_account", config::token_account_name );
+      asset transfer_amt(1000000000);
+      transfer( N(eosforce), a, transfer_amt, "create_account", config::token_account_name );
+      
+      asset stake(400000000);   
+      vote4ram2(a, N(codex.bpa), stake);
       
       return trace;
    }
@@ -678,6 +706,32 @@ namespace eosio { namespace testing {
       return push_transaction( trx );
    }
 
+   transaction_trace_ptr base_tester::vote4ram2( account_name voter, account_name bpname, asset stake ) {
+      variant pretty_trx = fc::mutable_variant_object()
+         ("actions", fc::variants({
+            fc::mutable_variant_object()
+               ("account", config::system_account_root)
+               ("name", "vote4ram2")
+               ("authorization", fc::variants({
+                  fc::mutable_variant_object()
+                     ("actor", voter)
+                     ("permission", name(config::active_name))
+               }))
+               ("data", fc::mutable_variant_object()
+                  ("voter", voter)
+                  ("bpname", bpname)
+                  ("stake", stake)
+               )
+            })
+         );
+
+      signed_transaction trx;
+      abi_serializer::from_variant(pretty_trx, trx, get_resolver(), abi_serializer_max_time);
+      set_transaction_headers(trx);
+
+      trx.sign( get_private_key( voter, name(config::active_name).to_string() ), control->get_chain_id()  );
+      return push_transaction( trx );
+   }
 
    transaction_trace_ptr base_tester::issue( account_name to, string amount, account_name currency, string memo ) {
       variant pretty_trx = fc::mutable_variant_object()

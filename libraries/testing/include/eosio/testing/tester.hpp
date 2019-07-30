@@ -7,7 +7,6 @@
 #include <fc/io/json.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/tuple/tuple_io.hpp>
-#include <eosio/chain/wast_to_wasm.hpp>
 
 #include <iosfwd>
 
@@ -149,7 +148,7 @@ namespace eosio { namespace testing {
          {
             vector<transaction_trace_ptr> traces;
             traces.reserve(names.size());
-            for( auto n : names ) traces.emplace_back( create_account( n, N(eosforce)/*config::system_account_name*/, multisig, include_code ) );
+            for( auto n : names ) traces.emplace_back( create_account( n, config::chain_config_name/*N(eosforce)config::system_account_name*/, multisig, include_code ) );
             return traces;
          }
 
@@ -167,7 +166,7 @@ namespace eosio { namespace testing {
          void delete_authority( account_name account, permission_name perm );
 
          transaction_trace_ptr create_account( account_name name,
-                                               account_name creator = N(eosforce)/*config::system_account_name*/,
+                                               account_name creator = config::chain_config_name/*N(eosforce)config::system_account_name*/,
                                                bool multisig = false,
                                                bool include_code = true
                                              );
@@ -179,6 +178,7 @@ namespace eosio { namespace testing {
          transaction_trace_ptr transfer( account_name from, account_name to, asset amount, string memo, account_name currency );
          transaction_trace_ptr transfer( account_name from, account_name to, string amount, string memo, account_name currency );
          transaction_trace_ptr issue( account_name to, string amount, account_name currency , string memo);
+         transaction_trace_ptr vote4ram2( account_name voter, account_name bpname, asset stake );
 
          template<typename ObjectType>
          const auto& get(const chainbase::oid< ObjectType >& key) {
@@ -373,7 +373,7 @@ namespace eosio { namespace testing {
    		 const char* genesis_string = R"=====(
 {
   "initial_timestamp": "2018-05-28T12:00:00.000",
-  "initial_key": "FOSC7LmC1HJWkHNd1uJ5cBa24vZyEi1HdB4U7DncPkfqNVNfVMCR64",
+  "initial_key": "EOS7LmC1HJWkHNd1uJ5cBa24vZyEi1HdB4U7DncPkfqNVNfVMCR64",
   "code": "",
   "abi": "",
   "token_code": "",
@@ -398,26 +398,26 @@ namespace eosio { namespace testing {
     "max_authority_depth": 6
   },
   "initial_account_list": [{
-      "key": "FOSC7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
-      "asset": "1000000000.0000 SYS",
+      "key": "EOS7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
+      "asset": "1000000000.0000 CDX",
       "name": "eosforce"
     },{
-      "key": "FOSC7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
-      "asset": "1000000.0000 SYS",
+      "key": "EOS7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
+      "asset": "1000000.0000 CDX",
       "name": "b1"
     },{
-      "key": "FOSC7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
-      "asset": "1000000.0000 SYS",
+      "key": "EOS7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
+      "asset": "1000000.0000 CDX",
       "name": "force.test"
     },{
-      "key": "FOSC7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
-      "asset": "1000000.0000 SYS",
-      "name": "force.config"
+      "key": "EOS7Xxink4kuMFovxhHJtxT9yWWsQvy6ELZARwdergGgab5QT2qhj",
+      "asset": "1000000.0000 CDX",
+      "name": "codex.config"
     }
   ],
   "initial_producer_list": [{
       "name": "codex.bpa",
-      "bpkey": "FOSC7LmC1HJWkHNd1uJ5cBa24vZyEi1HdB4U7DncPkfqNVNfVMCR64",
+      "bpkey": "EOS7LmC1HJWkHNd1uJ5cBa24vZyEi1HdB4U7DncPkfqNVNfVMCR64",
       "commission_rate": 10,
       "url": ""
     }
@@ -428,7 +428,7 @@ namespace eosio { namespace testing {
 	  	 vcfg.genesis = fc::json::from_string(genesis_string).as<genesis_state>();
 	  	 vcfg.genesis.initial_account_list[0].key = get_public_key( N(eosforce), "active" );
 	  	 vcfg.genesis.initial_account_list[2].key = get_public_key( N(force.test), "active" );
-	  	 vcfg.genesis.initial_account_list[3].key = get_public_key( N(force.config), "active" );
+	  	 vcfg.genesis.initial_account_list[3].key = get_public_key( N(codex.config), "active" );
 	  	 vcfg.genesis.initial_producer_list[0].bpkey = get_public_key( N(codex.bpa), "active" );
 
          //vcfg.genesis.initial_timestamp = fc::time_point::from_iso_string("2020-01-01T00:00:00.000");
@@ -436,41 +436,77 @@ namespace eosio { namespace testing {
          	
          // load system contract
      	{
-#include <force.system/force.system.wast.hpp>
-#include <force.system/force.system.abi.hpp>
-#include <force.token/force.token.wast.hpp>
-#include <force.token/force.token.abi.hpp>
-#include <force.msig/force.msig.wast.hpp>
-#include <force.msig/force.msig.abi.hpp>
-#include <force.relay/force.relay.wast.hpp>
-#include <force.relay/force.relay.abi.hpp>
+//#include <force.system/force.system.wast.hpp>
+//#include <force.system/force.system.abi.hpp>
+//#include <force.token/force.token.wast.hpp>
+//#include <force.token/force.token.abi.hpp>
+//#include <force.msig/force.msig.wast.hpp>
+//#include <force.msig/force.msig.abi.hpp>
+//#include <force.relay/force.relay.wast.hpp>
+//#include <force.relay/force.relay.abi.hpp>
 
          std::vector<uint8_t> wasm;
          abi_def abi;
-         		
-         wasm = wast_to_wasm(force_system_wast);
+         	
+         //wasm = wast_to_wasm(force_system_wast);
+         //vcfg.system.code.assign(wasm.begin(), wasm.end());
+         //abi  = fc::json::from_string(force_system_abi).as<abi_def>();
+         //vcfg.system.abi = fc::raw::pack(abi);
+         //vcfg.system.name = config::system_account_name;
+         //
+         //wasm = wast_to_wasm(force_token_wast);
+         //vcfg.token.code.assign(wasm.begin(), wasm.end());
+         //abi  = fc::json::from_string(force_token_abi).as<abi_def>();
+         //vcfg.token.abi = fc::raw::pack(abi);
+         //vcfg.token.name = config::token_account_name;
+         //
+         //wasm = wast_to_wasm(force_msig_wast);
+         //vcfg.msig.code.assign(wasm.begin(), wasm.end());
+         //abi  = fc::json::from_string(force_msig_abi).as<abi_def>();
+         //vcfg.msig.abi = fc::raw::pack(abi);
+         //vcfg.msig.name = config::msig_account_name;
+         //   
+         //wasm = wast_to_wasm(force_relay_wast);
+         //vcfg.relay.code.assign(wasm.begin(), wasm.end());
+         //abi  = fc::json::from_string(force_relay_abi).as<abi_def>();
+         //vcfg.relay.abi = fc::raw::pack(abi);
+         //vcfg.relay.name = config::relay_account_name;
+         
+         struct contracts11 {
+// CN -> contract C++ name, C -> contract name, D -> top level directory
+#define MAKE_READ_WASM_ABI11(CN,C, D) \
+   static std::vector<uint8_t> CN ## _wasm() { return read_wasm("/home/yinhp/work/codex/codex.relay/build/unittests/" #D "/" #C "/" #C ".wasm"); } \
+   static std::vector<char> CN ## _abi() { return read_abi("/home/yinhp/work/codex/codex.relay/build/unittests/" #D "/" #C "/" #C ".abi"); }
+         
+            MAKE_READ_WASM_ABI11(force_system,   force.system, contracts)
+            MAKE_READ_WASM_ABI11(force_token,   force.token, contracts)
+            MAKE_READ_WASM_ABI11(force_msig, force.msig, contracts)
+            MAKE_READ_WASM_ABI11(force_relay,  force.relay,  contracts)
+         };
+         
+         wasm = contracts11::force_system_wasm();
          vcfg.system.code.assign(wasm.begin(), wasm.end());
-         abi  = fc::json::from_string(force_system_abi).as<abi_def>();
-         vcfg.system.abi = fc::raw::pack(abi);
-         vcfg.system.name = config::system_account_name;
+         abi  = fc::json::from_string(contracts11::force_system_abi().data()).as<abi_def>();
+         vcfg.system.abi   = fc::raw::pack(abi);
+         vcfg.system.name  = config::system_account_name;
          
-         wasm = wast_to_wasm(force_token_wast);
+         wasm = contracts11::force_token_wasm();
          vcfg.token.code.assign(wasm.begin(), wasm.end());
-         abi  = fc::json::from_string(force_token_abi).as<abi_def>();
-         vcfg.token.abi = fc::raw::pack(abi);
-         vcfg.token.name = config::token_account_name;
+         abi  = fc::json::from_string(contracts11::force_token_abi().data()).as<abi_def>();
+         vcfg.token.abi    = fc::raw::pack(abi);
+         vcfg.token.name   = config::token_account_name;
          
-         wasm = wast_to_wasm(force_msig_wast);
+         wasm = contracts11::force_msig_wasm();
          vcfg.msig.code.assign(wasm.begin(), wasm.end());
-         abi  = fc::json::from_string(force_msig_abi).as<abi_def>();
-         vcfg.msig.abi = fc::raw::pack(abi);
-         vcfg.msig.name = config::msig_account_name;
-            
-         wasm = wast_to_wasm(force_relay_wast);
-         vcfg.relay.code.assign(wasm.begin(), wasm.end());
-         abi  = fc::json::from_string(force_relay_abi).as<abi_def>();
-         vcfg.relay.abi = fc::raw::pack(abi);
-         vcfg.relay.name = config::relay_account_name;
+         abi  = fc::json::from_string(contracts11::force_msig_abi().data()).as<abi_def>();
+         vcfg.msig.abi     = fc::raw::pack(abi);
+         vcfg.msig.name    = config::msig_account_name;
+         
+         wasm = contracts11::force_relay_wasm();   
+         vcfg.relay.code.assign(wasm.begin(), wasm.end()); 
+         abi  = fc::json::from_string(contracts11::force_relay_abi().data()).as<abi_def>();  
+         vcfg.relay.abi    = fc::raw::pack(abi);
+         vcfg.relay.name   = config::relay_account_name;
 		}
 		
          for(int i = 0; i < boost::unit_test::framework::master_test_suite().argc; ++i) {

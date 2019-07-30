@@ -307,7 +307,7 @@ struct MySink : public bio::sink
 };
 uint32_t last_fnc_err = 0;
 
-BOOST_FIXTURE_TEST_CASE(action_receipt_tests, TESTER) { try {
+/*BOOST_FIXTURE_TEST_CASE(action_receipt_tests, TESTER) { try {
    produce_blocks(2);
    create_account( N(test) );
    set_code( N(test), contracts::payloadless_wasm() );
@@ -331,13 +331,15 @@ BOOST_FIXTURE_TEST_CASE(action_receipt_tests, TESTER) { try {
       checker( res );
    };
 
-	//set_code( N(testapi), eosio_bios_wast );
-   //set_abi(N(testapi), eosio_bios_abi);
-	//set_code( N(testapi), test_api_wast );
-	//set_code( N(eosforce), test_api_wast );
-	//res = CALL_TEST_FUNCTION( *this, "test_action", "assert_true", {});
-   //BOOST_REQUIRE_EQUAL(uint32_t(res->action_traces[0].receipt.code_sequence), 4);
-   //BOOST_REQUIRE_EQUAL(uint32_t(res->action_traces[0].receipt.abi_sequence), 1);
+   auto result = push_reqauth( config::system_account_name, "active" );
+   BOOST_REQUIRE_EQUAL( result->receipt->status, transaction_receipt::executed );
+   BOOST_REQUIRE( result->action_traces[0].receipt.auth_sequence.find( config::system_account_name )
+                     != result->action_traces[0].receipt.auth_sequence.end() );
+   auto base_global_sequence_num = result->action_traces[0].receipt.global_sequence;
+   auto base_system_recv_seq_num = result->action_traces[0].receipt.recv_sequence;
+   auto base_system_auth_seq_num = result->action_traces[0].receipt.auth_sequence[config::system_account_name];
+   auto base_system_code_seq_num = result->action_traces[0].receipt.code_sequence.value;
+   auto base_system_abi_seq_num  = result->action_traces[0].receipt.abi_sequence.value;
 
    uint64_t base_test_recv_seq_num = 0;
    uint64_t base_test_auth_seq_num = 0;
@@ -406,7 +408,7 @@ BOOST_FIXTURE_TEST_CASE(action_receipt_tests, TESTER) { try {
       BOOST_CHECK_EQUAL( m.begin()->second, base_test_auth_seq_num + 8 );
    } );
 
-} FC_LOG_AND_RETHROW() }
+} FC_LOG_AND_RETHROW() }*/
 
 /*************************************************************************************
  * action_tests test case
@@ -1522,7 +1524,7 @@ BOOST_FIXTURE_TEST_CASE(multi_index_tests, TESTER) { try {
    push_action( N(testapi), N(s1skcache),  N(testapi), {} ); // idx64_sk_cache_pk_lookup
    push_action( N(testapi), N(s1pkcache),  N(testapi), {} ); // idx64_pk_cache_sk_lookup
 
-   BOOST_REQUIRE_EQUAL( validate(), true );
+   BOOST_REQUIRE_EQUAL( validate(), true );*/
 } FC_LOG_AND_RETHROW() }
 
 /*************************************************************************************
@@ -2018,45 +2020,6 @@ BOOST_FIXTURE_TEST_CASE(datastream_tests, TESTER) { try {
    produce_blocks(1000);
 
    CALL_TEST_FUNCTION( *this, "test_datastream", "test_basic", {} );
-
-   BOOST_REQUIRE_EQUAL( validate(), true );
-} FC_LOG_AND_RETHROW() }
-
-/*************************************************************************************
- * new api feature test
- *************************************************************************************/
-BOOST_FIXTURE_TEST_CASE(new_api_feature_tests, TESTER) { try {
-
-   produce_blocks(1);
-   create_account(N(testapi) );
-   produce_blocks(1);
-   set_code(N(testapi), test_api_wast);
-   produce_blocks(1);
-
-   BOOST_CHECK_EXCEPTION( CALL_TEST_FUNCTION( *this, "test_transaction", "new_feature", {} ),
-      unaccessible_api,
-      [](const fc::exception& e) {
-         return expect_assert_message(e, "testapi does not have permission to call this API");
-      });
-
-   BOOST_CHECK_EXCEPTION( CALL_TEST_FUNCTION( *this, "test_transaction", "active_new_feature", {} ),
-      unaccessible_api,
-      [](const fc::exception& e) {
-         return expect_assert_message(e, "testapi does not have permission to call this API");
-      });
-
-   // change privilege
-//   push_action(config::system_account_name, N(setpriv), config::system_account_name,  mutable_variant_object()
-//                                                       ("account", "testapi")
-//                                                       ("is_priv", 1));
-
-   CALL_TEST_FUNCTION( *this, "test_transaction", "new_feature", {} );
-
-   BOOST_CHECK_EXCEPTION( CALL_TEST_FUNCTION( *this, "test_transaction", "active_new_feature", {} ),
-      unsupported_feature,
-      [](const fc::exception& e) {
-         return expect_assert_message(e, "Unsupported Hardfork Detected");
-      });
 
    BOOST_REQUIRE_EQUAL( validate(), true );
 } FC_LOG_AND_RETHROW() }
