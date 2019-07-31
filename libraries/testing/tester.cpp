@@ -148,11 +148,11 @@ namespace eosio { namespace testing {
 }
 )=====";
 
-	  cfg.genesis = fc::json::from_string(genesis_string).as<genesis_state>();
-	  cfg.genesis.initial_account_list[0].key = get_public_key( N(eosforce), "active" );
-	  cfg.genesis.initial_account_list[2].key = get_public_key( N(force.test), "active" );
-	  cfg.genesis.initial_account_list[3].key = get_public_key( N(codex.config), "active" );
-	  cfg.genesis.initial_producer_list[0].bpkey = get_public_key( N(codex.bpa), "active" );
+	   cfg.genesis = fc::json::from_string(genesis_string).as<genesis_state>();
+	   cfg.genesis.initial_account_list[0].key = get_public_key( N(eosforce), "active" );
+	   cfg.genesis.initial_account_list[2].key = get_public_key( N(force.test), "active" );
+	   cfg.genesis.initial_account_list[3].key = get_public_key( N(codex.config), "active" );
+	   cfg.genesis.initial_producer_list[0].bpkey = get_public_key( N(codex.bpa), "active" );
 
       cfg.genesis.initial_key = get_public_key( config::system_account_name, "active" );
 
