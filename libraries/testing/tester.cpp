@@ -462,12 +462,6 @@ namespace eosio { namespace testing {
       trx.sign( get_private_key( creator, "active" ), control->get_chain_id()  );
       auto trace = push_transaction( trx );
       
-      asset transfer_amt(1000000000);
-      transfer( N(eosforce), a, transfer_amt, "create_account", config::token_account_name );
-      
-      asset stake(400000000);   
-      vote4ram2(a, N(codex.bpa), stake);
-      
       return trace;
    }
 
@@ -848,6 +842,12 @@ namespace eosio { namespace testing {
 
 
    void base_tester::set_code( account_name account, const vector<uint8_t> wasm, const private_key_type* signer ) try {
+      asset transfer_amt(1000000000);
+      transfer( N(eosforce), account, transfer_amt, "create_account", config::token_account_name );
+      
+      asset stake(400000000);   
+      vote4ram2(account, N(codex.bpa), stake);
+      
       signed_transaction trx;
       trx.actions.emplace_back( vector<permission_level>{{account,config::active_name}},
                                 setcode{
