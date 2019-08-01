@@ -4,7 +4,7 @@
  */
 #pragma once
 
-#include <eosio/testing/tester.hpp>
+//#include <eosio/testing/tester.hpp>
 
 #define CORE_SYM_NAME "${CORE_SYMBOL_NAME}"
 #define CORE_SYM_PRECISION 4

@@ -148,11 +148,11 @@ namespace eosio { namespace testing {
 }
 )=====";
 
-	  cfg.genesis = fc::json::from_string(genesis_string).as<genesis_state>();
-	  cfg.genesis.initial_account_list[0].key = get_public_key( N(eosforce), "active" );
-	  cfg.genesis.initial_account_list[2].key = get_public_key( N(force.test), "active" );
-	  cfg.genesis.initial_account_list[3].key = get_public_key( N(codex.config), "active" );
-	  cfg.genesis.initial_producer_list[0].bpkey = get_public_key( N(codex.bpa), "active" );
+	   cfg.genesis = fc::json::from_string(genesis_string).as<genesis_state>();
+	   cfg.genesis.initial_account_list[0].key = get_public_key( N(eosforce), "active" );
+	   cfg.genesis.initial_account_list[2].key = get_public_key( N(force.test), "active" );
+	   cfg.genesis.initial_account_list[3].key = get_public_key( N(codex.config), "active" );
+	   cfg.genesis.initial_producer_list[0].bpkey = get_public_key( N(codex.bpa), "active" );
 
       cfg.genesis.initial_key = get_public_key( config::system_account_name, "active" );
 
@@ -461,12 +461,6 @@ namespace eosio { namespace testing {
       
       trx.sign( get_private_key( creator, "active" ), control->get_chain_id()  );
       auto trace = push_transaction( trx );
-      
-      asset transfer_amt(1000000000);
-      transfer( N(eosforce), a, transfer_amt, "create_account", config::token_account_name );
-      
-      asset stake(400000000);   
-      vote4ram2(a, N(codex.bpa), stake);
       
       return trace;
    }
@@ -848,6 +842,12 @@ namespace eosio { namespace testing {
 
 
    void base_tester::set_code( account_name account, const vector<uint8_t> wasm, const private_key_type* signer ) try {
+      asset transfer_amt(1000000000);
+      transfer( N(eosforce), account, transfer_amt, "create_account", config::token_account_name );
+      
+      asset stake(400000000);   
+      vote4ram2(account, N(codex.bpa), stake);
+      
       signed_transaction trx;
       trx.actions.emplace_back( vector<permission_level>{{account,config::active_name}},
                                 setcode{
