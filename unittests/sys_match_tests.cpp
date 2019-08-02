@@ -699,5 +699,68 @@ BOOST_AUTO_TEST_CASE( test6 ) { try {
    BOOST_REQUIRE_EQUAL(escrow_base_before - asset::from_string( "2.0000 CBTC" ), escrow_base_now);
 } FC_LOG_AND_RETHROW() }
 
+// eat ask orders continuously (bid price is greater than last deal price)
+BOOST_AUTO_TEST_CASE( test7 ) { try {
+   asset quantity, matched;
+   asset seller_base_before, seller_base_now, seller_quote_before, seller_quote_now;
+   asset buyer_base_before, buyer_base_now, buyer_quote_before, buyer_quote_now;
+   asset escrow_base_before, escrow_base_now, escrow_quote_before, escrow_quote_now;
+   symbol pair1_base_sym = asset::from_string(string(token1_max_supply)).get_symbol();
+   symbol pair1_quote_sym = asset::from_string(string(token2_max_supply)).get_symbol();
+
+   // efc push action relay.token trade '["testa", "codex.match", "eosforce", "1.0000 CBTC", "1", "trade;0;4100.00 CUSDT;0;biosbpa;;2"]' -p testa
+   quantity = asset::from_string( "1.0000 CBTC" );
+   buyer_quote_before = get_relay_token_currency_balance(rel_token_acc, token2_chain, quantity.get_symbol(), buyer);
+   push_action(rel_token_acc, name("trade"), seller, fc::mutable_variant_object()
+           ("from", seller)
+           ("to", escrow)
+           ("chain", token1_chain)
+           ("quantity", quantity)
+           ("type", trade_type)
+           ("memo", "trade;0;4100.00 CUSDT;0;biosbpa;;2")
+   );
+   buyer_quote_now = get_relay_token_currency_balance(rel_token_acc, token2_chain, quantity.get_symbol(), buyer);
+   BOOST_REQUIRE_EQUAL(buyer_quote_before, buyer_quote_now);
+
+   // efc push action relay.token trade '["testa", "codex.match", "btc1", "2.0000 CBTC", "1", "trade;0;4200.00 CUSDT;0;biosbpa;;2"]' -p testa
+   quantity = asset::from_string( "2.0000 CBTC" );
+   buyer_quote_before = get_relay_token_currency_balance(rel_token_acc, token2_chain, quantity.get_symbol(), buyer);
+   escrow_quote_before = get_relay_token_currency_balance(rel_token_acc, token2_chain, quantity.get_symbol(), escrow);
+   push_action(rel_token_acc, name("trade"), seller, fc::mutable_variant_object()
+           ("from", seller)
+           ("to", escrow)
+           ("chain", token1_chain)
+           ("quantity", quantity)
+           ("type", trade_type)
+           ("memo", "trade;0;4200.00 CUSDT;0;biosbpa;;2")
+   );
+   buyer_quote_now = get_relay_token_currency_balance(rel_token_acc, token2_chain, quantity.get_symbol(), buyer);
+   escrow_quote_now = get_relay_token_currency_balance(rel_token_acc, token2_chain, quantity.get_symbol(), escrow);
+   BOOST_REQUIRE_EQUAL(buyer_quote_before, buyer_quote_now);
+   BOOST_REQUIRE_EQUAL(escrow_quote_before, escrow_quote_now); // quote toeken: buyer -> seller,  escrow do not change
+
+   // efc push action relay.token trade '["testb", "codex.match", "usdt1", "8600.0000 CUSDT", "1", "trade;0;4300.0000 CUSDT;1;biosbpa;;2"]' -p testb
+   quantity = asset::from_string( "8600.0000 CUSDT" );
+   seller_base_before = get_relay_token_currency_balance(rel_token_acc, token1_chain, pair1_base_sym, seller);
+   seller_quote_before = get_relay_token_currency_balance(rel_token_acc, token2_chain, pair1_quote_sym, seller);
+   buyer_base_before = get_relay_token_currency_balance(rel_token_acc, token1_chain, pair1_base_sym, buyer);
+   buyer_quote_before = get_relay_token_currency_balance(rel_token_acc, token2_chain, quantity.get_symbol(), buyer);
+   escrow_base_before = get_relay_token_currency_balance(rel_token_acc, token1_chain, pair1_base_sym, escrow);
+   escrow_quote_before = get_relay_token_currency_balance(rel_token_acc, token2_chain, quantity.get_symbol(), escrow);
+   push_action(rel_token_acc, name("trade"), buyer, fc::mutable_variant_object()
+           ("from", buyer)
+           ("to", escrow)
+           ("chain", token2_chain)
+           ("quantity", quantity)
+           ("type", trade_type)
+           ("memo", "trade;0;4300.0000 CUSDT;1;biosbpa;;2")
+   );
+   seller_quote_now = get_relay_token_currency_balance(rel_token_acc, token2_chain, pair1_quote_sym, seller);
+   buyer_base_now = get_relay_token_currency_balance(rel_token_acc, token1_chain, pair1_base_sym, buyer);
+   escrow_base_now = get_relay_token_currency_balance(rel_token_acc, token1_chain, pair1_base_sym, escrow);
+   BOOST_REQUIRE_EQUAL(seller_quote_before + asset::from_string( "8300.0000 CUSDT" ), seller_quote_now);
+   BOOST_REQUIRE_EQUAL(buyer_base_before + asset::from_string( "2.0000 CBTC" ), buyer_base_now);
+   BOOST_REQUIRE_EQUAL(escrow_base_before - asset::from_string( "2.0000 CBTC" ), escrow_base_now);
+} FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()
