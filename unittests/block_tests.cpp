@@ -83,7 +83,7 @@ std::pair<signed_block_ptr, signed_block_ptr> corrupt_trx_in_block(validating_te
 }
 
 // verify that a block with a transaction with an incorrect signature, is blindly accepted from a trusted producer
-BOOST_AUTO_TEST_CASE(trusted_producer_test)
+/*BOOST_AUTO_TEST_CASE(trusted_producer_test)
 {
    flat_set<account_name> trusted_producers = { N(defproducera), N(defproducerc) };
    validating_tester main(trusted_producers);
@@ -161,6 +161,6 @@ BOOST_AUTO_TEST_CASE(untrusted_producer_test)
    [] (const fc::exception &e)->bool {
       return e.code() == unsatisfied_authorization::code_value ;
    }) ;
-}
+}*/
 
 BOOST_AUTO_TEST_SUITE_END()
