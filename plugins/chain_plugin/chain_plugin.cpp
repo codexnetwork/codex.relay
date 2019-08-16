@@ -1271,6 +1271,7 @@ read_only::get_table_by_scope_result read_only::get_table_by_scope( const read_o
 }
 
 vector<asset> read_only::get_currency_balance( const read_only::get_currency_balance_params& p )const {
+
    const abi_def abi = eosio::chain_apis::get_abi( db, p.code );
    (void)get_table_type( abi, "accounts" );
 
