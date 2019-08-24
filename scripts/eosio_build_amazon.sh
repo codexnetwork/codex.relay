@@ -116,31 +116,7 @@ if [ "${MEM_MEG}" -lt 7000 ]; then
 	exit 1
 fi
 
-	if [ "${COUNT}" -gt 1 ]; then
-		printf "\\n\\tThe following dependencies are required to install EOSIO.\\n"
-		printf "\\n\\t${DISPLAY}\\n\\n"
-		printf "\\tDo you wish to install these dependencies?\\n"
-		if is_noninteractive; then exec <<< "1"; fi
-		select yn in "Yes" "No"; do
-			case $yn in
-				[Yy]* ) 
-					printf "\\n\\n\\tInstalling dependencies.\\n\\n"
-					if ! sudo "${YUM}" -y install ${DEP}
-					then
-						printf "\\n\\tYUM dependency installation failed.\\n"
-						printf "\\n\\tExiting now.\\n"
-						exit 1
-					else
-						printf "\\n\\tYUM dependencies installed successfully.\\n"
-					fi
-				break;;
-				[Nn]* ) printf "\\nUser aborting installation of required dependencies,\\n Exiting now.\\n"; exit;;
-				* ) echo "Please type 1 for yes or 2 for no.";;
-			esac
-		done
-	else 
-		printf "\\n\\tNo required YUM dependencies to install.\\n"
-	fi
+printf "\\n"
 
 
 printf "Checking CMAKE installation...\\n"
