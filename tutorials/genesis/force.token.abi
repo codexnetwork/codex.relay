@@ -1,6 +1,11 @@
 {
   "version": "eosio::abi/1.0",
-  "types": [],
+  "types": [
+    {
+      "new_type_name": "account_name",
+      "type": "name"
+    }
+  ],
   "structs": [
     {
       "name": "transfer",
@@ -38,6 +43,32 @@
         }
       ]
     },
+      {
+         "name":"trade",
+         "base":"",
+         "fields":[
+            {
+               "name":"from",
+               "type":"account_name"
+            },
+            {
+               "name":"to",
+               "type":"account_name"
+            },
+            {
+               "name":"quantity",
+               "type":"asset"
+            },
+            {
+               "name":"type",
+               "type":"uint64"
+            },
+            {
+               "name":"memo",
+               "type":"string"
+            }
+         ]
+      },
     {
       "name": "issue",
       "base": "",
@@ -97,6 +128,72 @@
           "type": "asset"
         }
       ]
+    },
+    {
+      "name": "coin_cast",
+      "base": "",
+      "fields": [
+        {
+          "name": "balance",
+          "type": "asset"
+        },
+        {
+          "name":"finish_block",
+          "type":"uint32"
+        }
+      ]
+    },
+    {
+      "name": "castcoin",
+      "base": "",
+      "fields": [
+        {
+          "name": "from",
+          "type": "account_name"
+        },
+        {
+          "name": "to",
+          "type": "account_name"
+        },
+        {
+          "name": "quantity",
+          "type": "asset"
+        }
+      ]
+    },
+    {
+      "name": "takecoin",
+      "base": "",
+      "fields": [
+        {
+          "name": "to",
+          "type": "account_name"
+        }
+      ]
+    },
+    {
+      "name": "opencast",
+      "base": "",
+      "fields": [
+        {
+          "name": "to",
+          "type": "account_name"
+        }
+      ]
+    },
+    {
+      "name": "closecast",
+      "base": "",
+      "fields": [
+        {
+          "name": "to",
+          "type": "account_name"
+        },
+        {
+          "name": "finish_block",
+          "type": "int32"
+        }
+      ]
     }
   ],
   "actions": [
@@ -119,6 +216,31 @@
       "name": "fee",
       "type": "fee",
       "ricardian_contract": ""
+    },
+    {
+      "name":"trade",
+      "type":"trade",
+      "ricardian_contract":""
+    },
+    {
+      "name":"castcoin",
+      "type":"castcoin",
+      "ricardian_contract":""
+    },
+    {
+      "name":"takecoin",
+      "type":"takecoin",
+      "ricardian_contract":""
+    },
+    {
+      "name":"opencast",
+      "type":"opencast",
+      "ricardian_contract":""
+    },
+    {
+      "name":"closecast",
+      "type":"closecast",
+      "ricardian_contract":""
     }
   ],
   "tables": [
@@ -134,6 +256,13 @@
       "type": "currency_stats",
       "index_type": "i64",
       "key_names": [ "currency" ],
+      "key_types": [ "uint64" ]
+    },
+    {
+      "name": "coincast",
+      "type": "coin_cast",
+      "index_type": "i64",
+      "key_names": [ "finishblock" ],
       "key_types": [ "uint64" ]
     }
   ],
