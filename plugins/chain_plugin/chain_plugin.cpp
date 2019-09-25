@@ -795,6 +795,7 @@ void chain_plugin::plugin_initialize(const variables_map& options) {
       my->chain_config->msig.load(config::msig_account_name, config_path_root / "force.msig");
       my->chain_config->relay.load(config::relay_account_name, config_path_root / "force.relay");
 
+
       // some config need change
       my->chain_config->genesis.initial_configuration.max_block_cpu_usage = 1000000;
       my->chain_config->genesis.initial_configuration.max_transaction_cpu_usage = 500000;
