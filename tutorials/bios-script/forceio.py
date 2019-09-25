@@ -128,7 +128,7 @@ def setContractByPath(account, path):
 
 def parserArgsAndRun(parser, commands):
     parser.add_argument('--root', metavar='', help="Eosforce root dir from git", default='../../')
-    parser.add_argument('--contracts-dir', metavar='', help="Path to contracts directory", default='build/contracts/')
+    parser.add_argument('--contracts-dir', metavar='', help="Path to contracts directory", default='tutorials/genesis/')
     parser.add_argument('--log-path', metavar='', help="Path to log file", default='output.log')
     parser.add_argument('--nodes-dir', metavar='', help="Path to nodes directory", default='./nodes/')
     parser.add_argument('--wallet-dir', metavar='', help="Path to wallet directory", default='./wallet/')
