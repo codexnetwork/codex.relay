@@ -55,7 +55,6 @@ struct setcode {
    }
 };
 
-#if RESOURCE_MODEL == RESOURCE_MODEL_FEE
 struct setfee{
    account_name  account;
    action_name   action;
@@ -73,7 +72,6 @@ struct setfee{
       return config::action::setfee_name;
    }
 };
-#endif
 
 struct setabi {
    account_name                     account;
@@ -187,20 +185,6 @@ struct transfer_fee {
    }
 };
 
-struct trans_fee_voteage {
-   account_name  payer;
-   account_name  bpname;
-   int64_t       voteage;
-
-   static account_name get_account() {
-      return config::system_account_name;
-   }
-
-   static action_name get_name() {
-      return config::action::fee_name;
-   }
-};
-
 struct onerror {
    uint128_t      sender_id;
    bytes          sent_trx;
@@ -222,9 +206,7 @@ struct onerror {
 FC_REFLECT( eosio::chain::newaccount                       , (creator)(name)(owner)(active) )
 FC_REFLECT( eosio::chain::setconfig                        , (typ)(num)(key)(fee) )
 FC_REFLECT( eosio::chain::setcode                          , (account)(vmtype)(vmversion)(code) )
-#if RESOURCE_MODEL == RESOURCE_MODEL_FEE
 FC_REFLECT( eosio::chain::setfee                           , (account)(action)(fee)(cpu_limit)(net_limit)(ram_limit) )
-#endif
 FC_REFLECT( eosio::chain::setabi                           , (account)(abi) )
 FC_REFLECT( eosio::chain::updateauth                       , (account)(permission)(parent)(auth) )
 FC_REFLECT( eosio::chain::deleteauth                       , (account)(permission) )
@@ -232,5 +214,4 @@ FC_REFLECT( eosio::chain::linkauth                         , (account)(code)(typ
 FC_REFLECT( eosio::chain::unlinkauth                       , (account)(code)(type) )
 FC_REFLECT( eosio::chain::canceldelay                      , (canceling_auth)(trx_id) )
 FC_REFLECT( eosio::chain::transfer_fee                     , (payer)(quantity) )
-FC_REFLECT( eosio::chain::trans_fee_voteage                , (payer)(bpname)(voteage) )
 FC_REFLECT( eosio::chain::onerror                          , (sender_id)(sent_trx) )

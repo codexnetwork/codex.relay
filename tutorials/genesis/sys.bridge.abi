@@ -1,0 +1,517 @@
+{
+  "version": "eosio::abi/1.0",
+  "types": [],
+  "structs": [
+    {
+      "name": "addmarket",
+      "base": "",
+      "fields": [
+        {
+          "name": "trade",
+          "type": "name"
+        },
+        {
+          "name": "trade_maker",
+          "type": "account_name"
+        },
+        {
+          "name": "type",
+          "type": "uint64"
+        },
+        {
+          "name": "base_chain",
+          "type": "name"
+        },
+        {
+          "name": "base_amount",
+          "type": "asset"
+        },
+        {
+          "name": "base_weight",
+          "type": "uint64"
+        },
+        {
+          "name": "market_chain",
+          "type": "name"
+        },
+        {
+          "name": "market_amount",
+          "type": "asset"
+        },
+        {
+          "name": "market_weight",
+          "type": "uint64"
+        }
+      ]
+    },
+    {
+      "name": "addmortgage",
+      "base": "",
+      "fields": [
+        {
+          "name": "trade",
+          "type": "name"
+        },
+        {
+          "name": "trade_maker",
+          "type": "account_name"
+        },
+        {
+          "name": "recharge_account",
+          "type": "account_name"
+        },
+        {
+          "name": "coin_chain",
+          "type": "name"
+        },
+        {
+          "name": "recharge_amount",
+          "type": "asset"
+        },
+        {
+          "name": "type",
+          "type": "uint64"
+        }
+      ]
+    },
+    {
+      "name": "claimmortgage",
+      "base": "",
+      "fields": [
+        {
+          "name": "trade",
+          "type": "name"
+        },
+        {
+          "name": "trade_maker",
+          "type": "account_name"
+        },
+        {
+          "name": "recv_account",
+          "type": "account_name"
+        },
+        {
+          "name": "claim_amount",
+          "type": "asset"
+        },
+        {
+          "name": "type",
+          "type": "uint64"
+        }
+      ]
+    },
+    {
+      "name": "exchange",
+      "base": "",
+      "fields": [
+        {
+          "name": "trade",
+          "type": "name"
+        },
+        {
+          "name": "trade_maker",
+          "type": "account_name"
+        },
+        {
+          "name": "account_covert",
+          "type": "account_name"
+        },
+        {
+          "name": "account_recv",
+          "type": "account_name"
+        },
+        {
+          "name": "coin_chain",
+          "type": "name"
+        },
+        {
+          "name": "convert_amount",
+          "type": "asset"
+        },
+        {
+          "name": "type",
+          "type": "uint64"
+        }
+      ]
+    },
+    {
+      "name": "frozenmarket",
+      "base": "",
+      "fields": [
+        {
+          "name": "trade",
+          "type": "name"
+        },
+        {
+          "name": "trade_maker",
+          "type": "account_name"
+        }
+      ]
+    },
+    {
+      "name": "trawmarket",
+      "base": "",
+      "fields": [
+        {
+          "name": "trade",
+          "type": "name"
+        },
+        {
+          "name": "trade_maker",
+          "type": "account_name"
+        }
+      ]
+    },
+    {
+      "name": "setfixedfee",
+      "base": "",
+      "fields": [
+        {
+          "name": "trade",
+          "type": "name"
+        },
+        {
+          "name": "trade_maker",
+          "type": "account_name"
+        },
+        {
+          "name": "base",
+          "type": "asset"
+        },
+        {
+          "name": "market",
+          "type": "asset"
+        }
+      ]
+    },
+    {
+      "name": "setprofee",
+      "base": "",
+      "fields": [
+        {
+          "name": "trade",
+          "type": "name"
+        },
+        {
+          "name": "trade_maker",
+          "type": "account_name"
+        },
+        {
+          "name": "base_ratio",
+          "type": "uint64"
+        },
+        {
+          "name": "market_ratio",
+          "type": "uint64"
+        }
+      ]
+    },
+    {
+      "name": "setprominfee",
+      "base": "",
+      "fields": [
+        {
+          "name": "trade",
+          "type": "name"
+        },
+        {
+          "name": "trade_maker",
+          "type": "account_name"
+        },
+        {
+          "name": "base_ratio",
+          "type": "uint64"
+        },
+        {
+          "name": "market_ratio",
+          "type": "uint64"
+        },
+        {
+          "name": "base",
+          "type": "asset"
+        },
+        {
+          "name": "market",
+          "type": "asset"
+        }
+      ]
+    },
+    {
+      "name": "setweight",
+      "base": "",
+      "fields": [
+        {
+          "name": "trade",
+          "type": "name"
+        },
+        {
+          "name": "trade_maker",
+          "type": "account_name"
+        },
+        {
+          "name": "base_weight",
+          "type": "uint64"
+        },
+        {
+          "name": "market_weight",
+          "type": "uint64"
+        }
+      ]
+    },
+    {
+      "name": "settranscon",
+      "base": "",
+      "fields": [
+        {
+          "name": "chain",
+          "type": "name"
+        },
+        {
+          "name": "quantity",
+          "type": "asset"
+        },
+        {
+          "name": "contract_name",
+          "type": "account_name"
+        }
+      ]
+    },
+    {
+      "name": "removemarket",
+      "base": "",
+      "fields": [
+        {
+          "name": "trade",
+          "type": "name"
+        },
+        {
+          "name": "trade_maker",
+          "type": "account_name"
+        },
+        {
+          "name": "base_recv",
+          "type": "account_name"
+        },
+        {
+          "name": "market_recv",
+          "type": "account_name"
+        },
+      ]
+    },
+    {
+      "name": "claimfee",
+      "base": "",
+      "fields": [
+        {
+          "name": "trade",
+          "type": "name"
+        },
+        {
+          "name": "market_maker",
+          "type": "account_name"
+        },
+        {
+          "name": "recv_account",
+          "type": "account_name"
+        },
+        {
+          "name": "type",
+          "type": "uint64"
+        }
+      ]
+    },
+    {
+      "name": "trans_contract",
+      "base": "",
+      "fields": [
+        {
+            "name":"id",
+            "type":"uint64"
+        },
+        {
+          "name": "chain",
+          "type": "name"
+        },
+        {
+          "name": "quantity",
+          "type": "asset"
+        },
+        {
+          "name": "contract_name",
+          "type": "account_name"
+        }
+      ]
+    },
+    {
+      "name": "trade_fee",
+      "base": "",
+      "fields": [
+        {
+          "name": "base",
+          "type": "asset"
+        },
+        {
+          "name": "market",
+          "type": "asset"
+        },
+        {
+          "name": "base_ratio",
+          "type": "uint64"
+        },
+        {
+          "name": "market_ratio",
+          "type": "uint64"
+        },
+        {
+          "name": "fee_type",
+          "type": "uint64"
+        }
+      ]
+    },
+    {
+      "name": "coin",
+      "base": "",
+      "fields": [
+        {
+          "name": "chain",
+          "type": "name"
+        },
+        {
+          "name": "amount",
+          "type": "asset"
+        },
+        {
+          "name": "weight",
+          "type": "uint64"
+        },
+        {
+          "name": "fee_amount",
+          "type": "asset"
+        }
+      ]
+    },
+    {
+      "name": "trade_pair",
+      "base": "",
+      "fields": [
+        {
+          "name": "trade_name",
+          "type": "name"
+        },
+        {
+          "name": "type",
+          "type": "uint64"
+        },
+        {
+          "name": "base",
+          "type": "coin"
+        },
+        {
+          "name": "market",
+          "type": "coin"
+        },
+        {
+          "name": "trade_maker",
+          "type": "account_name"
+        },
+        {
+          "name": "isactive",
+          "type": "bool"
+        },
+        {
+          "name": "fee",
+          "type": "trade_fee"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "name": "addmarket",
+      "type": "addmarket",
+      "ricardian_contract": ""
+    },
+    {
+      "name": "addmortgage",
+      "type": "addmortgage",
+      "ricardian_contract": ""
+    },
+    {
+      "name": "claimmortgage",
+      "type": "claimmortgage",
+      "ricardian_contract": ""
+    },
+    {
+      "name": "exchange",
+      "type": "exchange",
+      "ricardian_contract": ""
+    },
+    {
+      "name": "frozenmarket",
+      "type": "frozenmarket",
+      "ricardian_contract": ""
+    },
+    {
+      "name": "trawmarket",
+      "type": "trawmarket",
+      "ricardian_contract": ""
+    },
+    {
+      "name": "setfixedfee",
+      "type": "setfixedfee",
+      "ricardian_contract": ""
+    },
+    {
+      "name": "setprofee",
+      "type": "setprofee",
+      "ricardian_contract": ""
+    },
+    {
+      "name": "setprominfee",
+      "type": "setprominfee",
+      "ricardian_contract": ""
+    },
+    {
+      "name": "setweight",
+      "type": "setweight",
+      "ricardian_contract": ""
+    },
+    {
+      "name": "settranscon",
+      "type": "settranscon",
+      "ricardian_contract": ""
+    },
+    {
+      "name": "removemarket",
+      "type": "removemarket",
+      "ricardian_contract": ""
+    },
+    {
+      "name": "claimfee",
+      "type": "claimfee",
+      "ricardian_contract": ""
+    }
+  ],
+  "tables": [
+    {
+      "name": "tradepairs",
+      "type": "trade_pair",
+      "index_type": "i64",
+      "key_names": [ "trade" ],
+      "key_types": [ "name" ]
+    },
+    {
+      "name":"transcon",
+      "type":"trans_contract",
+      "index_type":"i64",
+      "key_names":[
+         "chainsymbol"
+      ],
+      "key_types":[
+         "uint64"
+      ]
+    }
+  ],
+  "ricardian_clauses": [],
+  "abi_extensions": []
+}

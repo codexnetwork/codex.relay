@@ -20,6 +20,8 @@ def createNodeDir(nodeIndex, bpaccount, key):
     dir = datas.nodes_dir + ('/%02d-' % nodeIndex) + bpaccount['name'] + '/'
     run('rm -rf ' + dir)
     run('mkdir -p ' + dir)
+    run('mkdir -p ' + dir + 'config')
+    run('mkdir -p ' + dir + 'blocks')
 
 def createNodeDirs(inits, keys):
     for i in range(0, len(inits)):
@@ -32,10 +34,12 @@ def startNode(nodeIndex, bpaccount, key):
     if nodeIndex == 1:
         otherOpts += '    --contracts-console '
 
+    run('cp -r ' + datas.config_dir + ' ' +  dir + '/config')
+
     cmd = (
         datas.args.nodeos +
         '    --blocks-dir ' + dir + '/blocks'
-        '    --config-dir ' + datas.config_dir + 
+        '    --config-dir ' + dir + '/config'
         '    --data-dir ' + dir +
         ('    --http-server-address 0.0.0.0:%d0%02d' % (datas.args.use_port, nodeIndex)) +
         ('    --p2p-listen-endpoint 0.0.0.0:%d1%02d' % (datas.args.use_port, nodeIndex)) +
@@ -105,22 +109,22 @@ def stepMkConfig():
 
 def cpContract(account):
     run('mkdir -p %s/%s/' % (datas.config_dir, account))
-    run('cp ' + datas.contracts_dir + ('/%s/%s.abi ' % (account, account)) + datas.config_dir + "/" + account + "/")
-    run('cp ' + datas.contracts_dir + ('/%s/%s.wasm ' % (account, account)) + datas.config_dir + "/" + account + "/")
+    run('cp ' + datas.contracts_dir + ('/%s.abi ' % (account)) + datas.config_dir + "/" + account + "/")
+    run('cp ' + datas.contracts_dir + ('/%s.wasm ' % (account)) + datas.config_dir + "/" + account + "/")
 
 def stepMakeGenesis():
     rm(datas.config_dir)
     run('mkdir -p ' + datas.config_dir)
     run('mkdir -p ' + datas.config_dir + '/keys/' )
 
-    run('cp ' + datas.contracts_dir + '/force.token/force.token.abi ' + datas.config_dir)
-    run('cp ' + datas.contracts_dir + '/force.token/force.token.wasm ' + datas.config_dir)
-    run('cp ' + datas.contracts_dir + '/force.system/force.system.abi ' + datas.config_dir)
-    run('cp ' + datas.contracts_dir + '/force.system/force.system.wasm ' + datas.config_dir)
-    run('cp ' + datas.contracts_dir + '/force.msig/force.msig.abi ' + datas.config_dir)
-    run('cp ' + datas.contracts_dir + '/force.msig/force.msig.wasm ' + datas.config_dir)
-    run('cp ' + datas.contracts_dir + '/force.relay/force.relay.abi ' + datas.config_dir)
-    run('cp ' + datas.contracts_dir + '/force.relay/force.relay.wasm ' + datas.config_dir)
+    run('cp ' + datas.contracts_dir + '/force.token.abi ' + datas.config_dir)
+    run('cp ' + datas.contracts_dir + '/force.token.wasm ' + datas.config_dir)
+    run('cp ' + datas.contracts_dir + '/force.system.abi ' + datas.config_dir)
+    run('cp ' + datas.contracts_dir + '/force.system.wasm ' + datas.config_dir)
+    run('cp ' + datas.contracts_dir + '/force.msig.abi ' + datas.config_dir)
+    run('cp ' + datas.contracts_dir + '/force.msig.wasm ' + datas.config_dir)
+    run('cp ' + datas.contracts_dir + '/force.relay.abi ' + datas.config_dir)
+    run('cp ' + datas.contracts_dir + '/force.relay.wasm ' + datas.config_dir)
     
     run('cp ' + datas.args.root + 'tutorials/bios-script/genesis-data/config.ini ' + datas.config_dir)
 
