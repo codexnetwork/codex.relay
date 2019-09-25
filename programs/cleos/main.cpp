@@ -184,7 +184,6 @@ bool   print_request = false;
 bool   print_response = false;
 bool   no_auto_keosd = false;
 bool   verbose = false;
-string   voteage_bp_name = string("");
 
 uint8_t  tx_max_cpu_usage = 0;
 uint32_t tx_max_net_usage = 0;
@@ -331,10 +330,6 @@ fc::variant push_transaction( signed_transaction& trx, packed_transaction::compr
       trx.max_cpu_usage_ms = tx_max_cpu_usage;
       trx.max_net_usage_words = (tx_max_net_usage + 7)/8;
       trx.delay_sec = delaysec;
-      
-      if (voteage_bp_name.length() > 0) {
-         trx.transaction_extensions.emplace_back(transaction::voteage_fee, fc::raw::pack(account_name(voteage_bp_name)));
-      }
    }
 
    if (!tx_skip_sign) {
@@ -2991,8 +2986,6 @@ int main( int argc, char** argv ) {
    app.add_flag( "-v,--verbose", verbose, localized("output verbose errors and action console output"));
    app.add_flag("--print-request", print_request, localized("print HTTP request to STDERR"));
    app.add_flag("--print-response", print_response, localized("print HTTP response to STDERR"));
-
-   app.add_option( "--voteage-bp-name", voteage_bp_name, localized("bp name for voteage deduction fee"), true );
 
    auto version = app.add_subcommand("version", localized("Retrieve version information"), false);
    version->require_subcommand();

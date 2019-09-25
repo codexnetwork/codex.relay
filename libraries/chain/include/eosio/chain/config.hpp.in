@@ -42,6 +42,8 @@ const static uint64_t eosio_all_scope          = N(${ROOT_ACCOUNT}.all);
 const static uint64_t eosio_any_name           = N(${ROOT_ACCOUNT}.any);
 const static uint64_t eosio_code_name          = N(${ROOT_ACCOUNT}.code);
 const static uint64_t native_account_name      = N(${ROOT_ACCOUNT}.native);
+
+// For Codex.Relay
 const static uint64_t relay_account_name       = N(${ROOT_ACCOUNT}.relay);
 const static uint64_t relay_token_account_name = N(relay.token);
 const static uint64_t reward_account_name      = N(${ROOT_ACCOUNT}.reward);
