@@ -17,6 +17,7 @@ namespace eosio { namespace chain {
 
       init_native_fee(config::system_account_name, N(transfer),     asset(100));
       init_native_fee(config::system_account_name, N(vote),         asset(1000));
+      init_native_fee(config::system_account_name, N(voteproducer), asset(1000));
       init_native_fee(config::system_account_name, N(freeze),       asset(500));
       init_native_fee(config::system_account_name, N(unfreeze),     asset(100));
       init_native_fee(config::system_account_name, N(vote4ram),     asset(500));
