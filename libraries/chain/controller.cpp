@@ -1080,11 +1080,6 @@ struct controller_impl {
       initialize_contract(conf.msig, true);
       initialize_contract(conf.relay);
 
-      initialize_contract(conf.system, true);
-      initialize_contract(conf.token);
-      initialize_contract(conf.msig, true);
-
-
       const auto& sym = symbol(CORE_SYMBOL).to_symbol_code();
       const auto tsum = get_token_sum();
       memory_db(self).insert(config::token_account_name, sym, N(stat),
