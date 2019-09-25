@@ -975,7 +975,7 @@ struct controller_impl {
       const int64_t code_size = sc.code.size();
       const int64_t abi_size = sc.abi.size();
 
-      const auto& account = db.get<account_object, by_name>( contract_account_name );
+      const auto& account = db.get<account_object, by_name>( sc.name );
       db.modify(account, [&]( auto& a ) {
          if( abi_size > 0 ) {
             a.abi.assign(sc.abi.data(), abi_size);
@@ -998,7 +998,7 @@ struct controller_impl {
          });
       }
 
-      const auto& account_meta = db.get<account_metadata_object, by_name>( contract_account_name );
+      const auto& account_meta = db.get<account_metadata_object, by_name>( sc.name );
       db.modify(account_meta, [&]( auto& a ) {
          a.set_privileged( privileged );
          a.code_sequence += 1;
@@ -1010,7 +1010,7 @@ struct controller_impl {
       });
 
       // TODO need change
-      const auto& usage  = db.get<resource_limits::resource_usage_object, resource_limits::by_owner>( contract_account_name );
+      const auto& usage  = db.get<resource_limits::resource_usage_object, resource_limits::by_owner>( sc.name );
       db.modify( usage, [&]( auto& u ) {
           u.ram_usage += (code_size + abi_size) * config::setcode_ram_bytes_multiplier;
       });
